@@ -9,7 +9,7 @@ const products = Array.from({ length: 30 }, (_, i) => ({
 }));
 
 interface ProductGridProps {
-  onAddToCart: (id: number) => void;
+  onAddToCart: (id: number, name: string, price: number, image: string) => void;
 }
 
 const ProductGrid = ({ onAddToCart }: ProductGridProps) => {

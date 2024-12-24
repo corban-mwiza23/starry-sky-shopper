@@ -2,12 +2,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ShoppingCart } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { useToast } from "@/components/ui/use-toast";
+import { CartForm } from "./CartForm";
+import { CartItemList } from "./CartItemList";
 
-interface CartItem {
+export interface CartItem {
   id: number;
   name: string;
   price: number;
@@ -15,28 +13,13 @@ interface CartItem {
   image: string;
 }
 
-interface CheckoutFormData {
-  name: string;
-  email: string;
-  address: string;
-  city: string;
-  zipCode: string;
+interface CartProps {
+  items: CartItem[];
+  setItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
 }
 
-const Cart = () => {
-  const [items, setItems] = useState<CartItem[]>([]);
+const Cart = ({ items, setItems }: CartProps) => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const { toast } = useToast();
-
-  const form = useForm<CheckoutFormData>({
-    defaultValues: {
-      name: "",
-      email: "",
-      address: "",
-      city: "",
-      zipCode: "",
-    },
-  });
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -49,16 +32,6 @@ const Cart = () => {
 
   const handleRemoveItem = (id: number) => {
     setItems(items.filter(item => item.id !== id));
-  };
-
-  const onSubmit = (data: CheckoutFormData) => {
-    console.log("Checkout data:", { items, ...data });
-    toast({
-      title: "Order placed successfully!",
-      description: "Thank you for your purchase.",
-    });
-    setItems([]);
-    setIsCheckingOut(false);
   };
 
   return (
@@ -86,43 +59,11 @@ const Cart = () => {
             <p className="text-cosmic-light">Your cart is empty</p>
           ) : (
             <>
-              {items.map((item) => (
-                <div key={item.id} className="flex items-center gap-4 py-4 border-b border-white/10">
-                  <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />
-                  <div className="flex-1">
-                    <p className="text-white">{item.name}</p>
-                    <p className="text-sm text-cosmic-light">${item.price}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Button 
-                        variant="outline" 
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                      >
-                        -
-                      </Button>
-                      <span className="text-white">{item.quantity}</span>
-                      <Button 
-                        variant="outline" 
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                      >
-                        +
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        className="text-red-400 hover:text-red-300 ml-2"
-                        onClick={() => handleRemoveItem(item.id)}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  </div>
-                  <p className="text-white">${item.price * item.quantity}</p>
-                </div>
-              ))}
+              <CartItemList 
+                items={items}
+                onUpdateQuantity={handleUpdateQuantity}
+                onRemoveItem={handleRemoveItem}
+              />
               <div className="mt-6">
                 <p className="text-white text-lg font-semibold">Total: ${total.toFixed(2)}</p>
                 {!isCheckingOut ? (
@@ -133,91 +74,13 @@ const Cart = () => {
                     Proceed to Checkout
                   </Button>
                 ) : (
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-6">
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-white">Full Name</FormLabel>
-                            <FormControl>
-                              <Input {...field} className="bg-white/10 text-white border-white/20" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-white">Email</FormLabel>
-                            <FormControl>
-                              <Input {...field} type="email" className="bg-white/10 text-white border-white/20" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="address"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-white">Shipping Address</FormLabel>
-                            <FormControl>
-                              <Input {...field} className="bg-white/10 text-white border-white/20" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="city"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-white">City</FormLabel>
-                            <FormControl>
-                              <Input {...field} className="bg-white/10 text-white border-white/20" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="zipCode"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-white">ZIP Code</FormLabel>
-                            <FormControl>
-                              <Input {...field} className="bg-white/10 text-white border-white/20" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <div className="flex gap-4">
-                        <Button 
-                          type="button"
-                          variant="ghost" 
-                          onClick={() => setIsCheckingOut(false)}
-                          className="flex-1 text-white hover:text-cosmic-dark"
-                        >
-                          Back
-                        </Button>
-                        <Button 
-                          type="submit"
-                          className="flex-1 bg-white text-cosmic-dark hover:bg-cosmic-light"
-                        >
-                          Place Order
-                        </Button>
-                      </div>
-                    </form>
-                  </Form>
+                  <CartForm 
+                    onBack={() => setIsCheckingOut(false)}
+                    onComplete={() => {
+                      setItems([]);
+                      setIsCheckingOut(false);
+                    }}
+                  />
                 )}
               </div>
             </>
