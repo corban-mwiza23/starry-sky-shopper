@@ -2,8 +2,17 @@ import { useState, useEffect } from "react";
 import ProductGrid from "@/components/ProductGrid";
 import Cart from "@/components/Cart";
 
+interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+}
+
 const Index = () => {
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   useEffect(() => {
     const video = document.getElementById("bgVideo") as HTMLVideoElement;
@@ -14,14 +23,22 @@ const Index = () => {
     }
   }, []);
 
-  const handleAddToCart = (productId: number) => {
-    console.log("Added product to cart:", productId);
-    // Implement cart logic here
+  const handleAddToCart = (productId: number, name: string, price: number, image: string) => {
+    setCartItems(prevItems => {
+      const existingItem = prevItems.find(item => item.id === productId);
+      if (existingItem) {
+        return prevItems.map(item =>
+          item.id === productId
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
+      return [...prevItems, { id: productId, name, price, quantity: 1, image }];
+    });
   };
 
   return (
     <div className="min-h-screen relative">
-      {/* Background Video */}
       <div className="fixed inset-0 -z-10">
         <video
           id="bgVideo"
@@ -40,9 +57,8 @@ const Index = () => {
         <div className="absolute inset-0 bg-cosmic-dark/50 backdrop-blur-xs" />
       </div>
 
-      {/* Content */}
       <div className="relative z-10">
-        <Cart />
+        <Cart items={cartItems} setItems={setCartItems} />
         <div className="container mx-auto pt-20">
           <h1 className="text-4xl md:text-6xl font-bold text-white text-center mb-12 animate-fade-in">
             Cosmic Collection

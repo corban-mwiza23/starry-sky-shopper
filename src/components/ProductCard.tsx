@@ -7,7 +7,7 @@ interface ProductCardProps {
   name: string;
   price: number;
   image: string;
-  onAddToCart: (id: number) => void;
+  onAddToCart: (id: number, name: string, price: number, image: string) => void;
 }
 
 const ProductCard = ({ id, name, price, image, onAddToCart }: ProductCardProps) => {
@@ -15,7 +15,7 @@ const ProductCard = ({ id, name, price, image, onAddToCart }: ProductCardProps) 
   const { toast } = useToast();
 
   const handleAddToCart = () => {
-    onAddToCart(id);
+    onAddToCart(id, name, price, image);
     toast({
       title: "Added to cart",
       description: `${name} has been added to your cart.`,
