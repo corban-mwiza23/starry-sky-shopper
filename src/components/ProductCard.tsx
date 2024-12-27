@@ -32,12 +32,12 @@ const ProductCard = ({ id, name, price, image, onAddToCart }: ProductCardProps) 
         <img
           src={image}
           alt={name}
-          className="w-full h-[300px] object-cover transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-[200px] object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <div className={`absolute inset-0 bg-gradient-to-t from-cosmic-dark/80 to-transparent transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="absolute bottom-0 left-0 right-0 p-4 transform transition-transform duration-300">
-            <h3 className="text-white font-semibold text-lg mb-1">{name}</h3>
-            <p className="text-cosmic-light mb-3">${price}</p>
+          <div className="absolute bottom-0 left-0 right-0 p-3 transform transition-transform duration-300">
+            <h3 className="text-white font-semibold text-base mb-1">{name}</h3>
+            <p className="text-cosmic-light text-sm mb-2">${price}</p>
             <Button 
               onClick={handleAddToCart}
               className="w-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm transition-all duration-300"
