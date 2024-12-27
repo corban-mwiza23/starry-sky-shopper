@@ -5,8 +5,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-  'YOUR_SUPABASE_URL',
-  'YOUR_SUPABASE_ANON_KEY'
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
 const Admin = () => {
@@ -29,9 +29,10 @@ const Admin = () => {
       ]);
 
     if (error) {
+      console.error('Error adding product:', error);
       toast({
         title: "Error",
-        description: "Failed to add product",
+        description: error.message || "Failed to add product",
         variant: "destructive",
       });
     } else {
