@@ -2,12 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+import { supabase } from "@/integrations/supabase/client";
 
 const Admin = () => {
   const [name, setName] = useState("");
@@ -67,6 +62,7 @@ const Admin = () => {
               <label className="text-white block mb-2">Price</label>
               <Input
                 type="number"
+                step="0.01"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 className="bg-white/10 text-white border-white/20"
