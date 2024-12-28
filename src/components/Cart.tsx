@@ -16,9 +16,10 @@ export interface CartItem {
 interface CartProps {
   items: CartItem[];
   setItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
+  onOrderSubmit: (customerName: string) => Promise<boolean>;
 }
 
-const Cart = ({ items, setItems }: CartProps) => {
+const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -76,9 +77,12 @@ const Cart = ({ items, setItems }: CartProps) => {
                 ) : (
                   <CartForm 
                     onBack={() => setIsCheckingOut(false)}
-                    onComplete={() => {
-                      setItems([]);
-                      setIsCheckingOut(false);
+                    onComplete={async (customerName) => {
+                      const success = await onOrderSubmit(customerName);
+                      if (success) {
+                        setItems([]);
+                        setIsCheckingOut(false);
+                      }
                     }}
                   />
                 )}

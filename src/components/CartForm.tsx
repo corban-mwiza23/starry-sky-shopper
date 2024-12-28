@@ -14,7 +14,7 @@ interface CheckoutFormData {
 
 interface CartFormProps {
   onBack: () => void;
-  onComplete: () => void;
+  onComplete: (customerName: string) => void;
 }
 
 export const CartForm = ({ onBack, onComplete }: CartFormProps) => {
@@ -31,11 +31,7 @@ export const CartForm = ({ onBack, onComplete }: CartFormProps) => {
 
   const onSubmit = (data: CheckoutFormData) => {
     console.log("Checkout data:", data);
-    toast({
-      title: "Order placed successfully!",
-      description: "Thank you for your purchase.",
-    });
-    onComplete();
+    onComplete(data.name);
   };
 
   return (

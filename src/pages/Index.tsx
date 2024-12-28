@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import ProductGrid from "@/components/ProductGrid";
 import Cart from "@/components/Cart";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CartItem {
   id: number;
@@ -13,6 +15,7 @@ interface CartItem {
 const Index = () => {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     const video = document.getElementById("bgVideo") as HTMLVideoElement;
@@ -37,6 +40,38 @@ const Index = () => {
     });
   };
 
+  const handleOrderSubmit = async (customerName: string) => {
+    try {
+      for (const item of cartItems) {
+        const { error } = await supabase
+          .from('orders')
+          .insert({
+            product_id: item.id,
+            quantity: item.quantity,
+            total_price: item.price * item.quantity,
+            customer_name: customerName,
+          });
+
+        if (error) throw error;
+      }
+
+      toast({
+        title: "Order placed successfully!",
+        description: "Your order has been saved to our database.",
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error saving order:', error);
+      toast({
+        title: "Error placing order",
+        description: "There was a problem saving your order.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
   return (
     <div className="min-h-screen relative">
       <div className="fixed inset-0 -z-10">
@@ -58,7 +93,7 @@ const Index = () => {
       </div>
 
       <div className="relative z-10">
-        <Cart items={cartItems} setItems={setCartItems} />
+        <Cart items={cartItems} setItems={setCartItems} onOrderSubmit={handleOrderSubmit} />
         <div className="container mx-auto pt-20">
           <h1 className="text-4xl md:text-6xl font-bold text-white text-center mb-12 animate-fade-in">
             Cosmic Collection
