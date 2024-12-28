@@ -41,7 +41,7 @@ const Admin = () => {
       .from('orders')
       .select(`
         *,
-        products (
+        products!orders_product_id_fkey (
           name
         )
       `)
@@ -55,7 +55,7 @@ const Admin = () => {
         variant: "destructive",
       });
     } else {
-      setOrders(data);
+      setOrders(data as Order[]);
     }
   };
 
