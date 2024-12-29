@@ -1,17 +1,13 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import SalesChart from "@/components/SalesChart";
 import StatsCard from "@/components/admin/StatsCard";
 import OrdersTable from "@/components/admin/OrdersTable";
+import ProductManagement from "@/components/admin/ProductManagement";
 
 const Admin = () => {
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [image, setImage] = useState("");
   const [stats, setStats] = useState({
     totalRevenue: 0,
     totalOrders: 0,
@@ -91,48 +87,10 @@ const Admin = () => {
     };
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const { data, error } = await supabase
-      .from('products')
-      .insert([
-        {
-          name,
-          price: parseFloat(price),
-          image,
-        },
-      ]);
-
-    if (error) {
-      console.error('Error adding product:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to add product",
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Success",
-        description: "Product added successfully",
-      });
-      setName("");
-      setPrice("");
-      setImage("");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-[1400px] mx-auto p-8">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Sales Dashboard</h1>
-          <div className="flex gap-4">
-            <Button variant="outline">Day</Button>
-            <Button variant="outline">Week</Button>
-            <Button variant="outline">Month</Button>
-          </div>
-        </div>
+        <h1 className="text-3xl font-bold text-foreground mb-8">Sales Dashboard</h1>
         
         <div className="grid gap-8">
           {/* Stats Cards */}
@@ -160,44 +118,8 @@ const Admin = () => {
             <SalesChart />
           </Card>
 
-          {/* Add Product Form */}
-          <Card className="p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-foreground block mb-2">Product Name</label>
-                <Input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="bg-background"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-foreground block mb-2">Price</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  className="bg-background"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-foreground block mb-2">Image URL</label>
-                <Input
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  className="bg-background"
-                  required
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                Add Product
-              </Button>
-            </form>
-          </Card>
+          {/* Product Management */}
+          <ProductManagement />
 
           {/* Recent Orders */}
           <Card className="shadow-sm">
