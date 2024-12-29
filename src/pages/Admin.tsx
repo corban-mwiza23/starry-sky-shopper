@@ -3,63 +3,88 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import SalesChart from "@/components/SalesChart";
 import { Card } from "@/components/ui/card";
-
-interface Order {
-  id: number;
-  product_id: number;
-  quantity: number;
-  total_price: number;
-  customer_name: string;
-  status: string;
-  created_at: string;
-  products: {
-    name: string;
-  };
-}
+import SalesChart from "@/components/SalesChart";
+import StatsCard from "@/components/admin/StatsCard";
+import OrdersTable from "@/components/admin/OrdersTable";
 
 const Admin = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [stats, setStats] = useState({
+    totalRevenue: 0,
+    totalOrders: 0,
+    totalProfit: 0,
+    revenueGrowth: 0,
+    ordersGrowth: 0,
+    profitGrowth: 0
+  });
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    const fetchStats = async () => {
+      // Fetch current month's data
+      const currentDate = new Date();
+      const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
 
-  const fetchOrders = async () => {
-    const { data, error } = await supabase
-      .from('orders')
-      .select(`
-        *,
-        products!orders_product_id_fkey (
-          name
-        )
-      `)
-      .order('created_at', { ascending: false });
+      const { data: currentMonthData, error: currentError } = await supabase
+        .from('orders')
+        .select('total_price, created_at')
+        .gte('created_at', firstDayOfMonth.toISOString())
+        .lte('created_at', lastDayOfMonth.toISOString());
 
-    if (error) {
-      console.error('Error fetching orders:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch orders",
-        variant: "destructive",
+      // Fetch previous month's data
+      const firstDayOfLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+      const lastDayOfLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
+
+      const { data: lastMonthData, error: lastError } = await supabase
+        .from('orders')
+        .select('total_price, created_at')
+        .gte('created_at', firstDayOfLastMonth.toISOString())
+        .lte('created_at', lastDayOfLastMonth.toISOString());
+
+      if (currentError || lastError) {
+        console.error('Error fetching stats:', currentError || lastError);
+        return;
+      }
+
+      const currentRevenue = currentMonthData?.reduce((sum, order) => sum + Number(order.total_price), 0) || 0;
+      const lastRevenue = lastMonthData?.reduce((sum, order) => sum + Number(order.total_price), 0) || 0;
+      const revenueGrowth = lastRevenue ? ((currentRevenue - lastRevenue) / lastRevenue) * 100 : 0;
+
+      const currentOrders = currentMonthData?.length || 0;
+      const lastOrders = lastMonthData?.length || 0;
+      const ordersGrowth = lastOrders ? ((currentOrders - lastOrders) / lastOrders) * 100 : 0;
+
+      // Assuming 30% profit margin for demonstration
+      const currentProfit = currentRevenue * 0.3;
+      const lastProfit = lastRevenue * 0.3;
+      const profitGrowth = lastProfit ? ((currentProfit - lastProfit) / lastProfit) * 100 : 0;
+
+      setStats({
+        totalRevenue: currentRevenue,
+        totalOrders: currentOrders,
+        totalProfit: currentProfit,
+        revenueGrowth,
+        ordersGrowth,
+        profitGrowth
       });
-    } else {
-      setOrders(data as Order[]);
-    }
-  };
+    };
+
+    fetchStats();
+
+    // Set up real-time subscription for stats updates
+    const subscription = supabase
+      .channel('orders_stats')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, fetchStats)
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,21 +132,21 @@ const Admin = () => {
         <div className="grid gap-8">
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="p-6 shadow-sm">
-              <h3 className="text-sm text-muted-foreground mb-2">Total Revenue</h3>
-              <p className="text-2xl font-bold">$203,378</p>
-              <span className="text-sm text-green-500">+6.32%</span>
-            </Card>
-            <Card className="p-6 shadow-sm">
-              <h3 className="text-sm text-muted-foreground mb-2">Total Orders</h3>
-              <p className="text-2xl font-bold">54,544</p>
-              <span className="text-sm text-red-500">-3.54%</span>
-            </Card>
-            <Card className="p-6 shadow-sm">
-              <h3 className="text-sm text-muted-foreground mb-2">Total Profit</h3>
-              <p className="text-2xl font-bold">$333,653</p>
-              <span className="text-sm text-green-500">+4.12%</span>
-            </Card>
+            <StatsCard
+              title="Total Revenue"
+              value={`$${stats.totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+              trend={{ value: Number(stats.revenueGrowth.toFixed(2)), isPositive: stats.revenueGrowth > 0 }}
+            />
+            <StatsCard
+              title="Total Orders"
+              value={stats.totalOrders}
+              trend={{ value: Number(stats.ordersGrowth.toFixed(2)), isPositive: stats.ordersGrowth > 0 }}
+            />
+            <StatsCard
+              title="Total Profit"
+              value={`$${stats.totalProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+              trend={{ value: Number(stats.profitGrowth.toFixed(2)), isPositive: stats.profitGrowth > 0 }}
+            />
           </div>
 
           {/* Sales Chart */}
@@ -174,44 +199,7 @@ const Admin = () => {
             <div className="p-6 border-b">
               <h2 className="text-xl font-semibold">Recent Orders</h2>
             </div>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Order ID</TableHead>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Date</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {orders.map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell>#{order.id}</TableCell>
-                      <TableCell>{order.products?.name}</TableCell>
-                      <TableCell>{order.customer_name}</TableCell>
-                      <TableCell>{order.quantity}</TableCell>
-                      <TableCell>${order.total_price}</TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          order.status === 'completed' ? 'bg-green-100 text-green-800' :
-                          order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {order.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(order.created_at).toLocaleDateString()}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <OrdersTable />
           </Card>
         </div>
       </div>
