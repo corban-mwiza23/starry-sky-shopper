@@ -27,7 +27,12 @@ const Admin = () => {
       // Fetch current month's data
       const currentDate = new Date();
       const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-      const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59);
+
+      console.log('Date range:', {
+        firstDayOfMonth: firstDayOfMonth.toISOString(),
+        lastDayOfMonth: lastDayOfMonth.toISOString()
+      });
 
       const { data: currentMonthData, error: currentError } = await supabase
         .from('orders')
@@ -37,7 +42,7 @@ const Admin = () => {
 
       // Fetch previous month's data
       const firstDayOfLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
-      const lastDayOfLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
+      const lastDayOfLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0, 23, 59, 59);
 
       const { data: lastMonthData, error: lastError } = await supabase
         .from('orders')
