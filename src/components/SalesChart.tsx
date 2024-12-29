@@ -5,13 +5,27 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { AreaChart, Area, XAxis, YAxis } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 import { format } from "date-fns";
 
 interface SalesData {
   date: string;
   total: number;
 }
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-background/80 backdrop-blur-sm border border-border p-2 rounded-lg shadow-lg">
+        <p className="text-sm font-medium">{label}</p>
+        <p className="text-sm text-primary">
+          ${payload[0].value.toFixed(2)}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
 
 const SalesChart = () => {
   const [salesData, setSalesData] = useState<SalesData[]>([]);
@@ -93,9 +107,7 @@ const SalesChart = () => {
           axisLine={false}
           tickFormatter={(value) => `$${value}`}
         />
-        <ChartTooltip>
-          <ChartTooltipContent />
-        </ChartTooltip>
+        <Tooltip content={<CustomTooltip />} />
         <Area
           type="monotone"
           dataKey="total"
