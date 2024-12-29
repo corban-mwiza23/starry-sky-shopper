@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import SalesChart from "@/components/SalesChart";
 
 interface Order {
   id: number;
@@ -96,6 +97,12 @@ const Admin = () => {
         <h1 className="text-3xl font-bold text-white mb-8">Admin Dashboard</h1>
         
         <div className="grid gap-8">
+          {/* Sales Chart */}
+          <div className="bg-cosmic-dark/50 backdrop-blur-sm p-6 rounded-lg border border-white/20">
+            <h2 className="text-xl text-white mb-4">Sales Overview</h2>
+            <SalesChart />
+          </div>
+
           <div className="bg-cosmic-dark/50 backdrop-blur-sm p-6 rounded-lg border border-white/20">
             <h2 className="text-xl text-white mb-4">Add New Product</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
