@@ -8,6 +8,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Order {
@@ -64,6 +71,27 @@ const OrdersTable = () => {
     };
   }, [toast]);
 
+  const updateOrderStatus = async (orderId: number, newStatus: string) => {
+    const { error } = await supabase
+      .from('orders')
+      .update({ status: newStatus })
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error updating order status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update order status",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Order status updated successfully",
+      });
+    }
+  };
+
   return (
     <div className="overflow-x-auto">
       <Table>
@@ -87,13 +115,24 @@ const OrdersTable = () => {
               <TableCell>{order.quantity}</TableCell>
               <TableCell>${order.total_price.toFixed(2)}</TableCell>
               <TableCell>
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  order.status === 'completed' ? 'bg-green-100 text-green-800' :
-                  order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
-                  {order.status}
-                </span>
+                <Select
+                  defaultValue={order.status}
+                  onValueChange={(value) => updateOrderStatus(order.id, value)}
+                >
+                  <SelectTrigger className={`w-[130px] ${
+                    order.status === 'completed' ? 'bg-green-100 text-green-800' :
+                    order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="processing">Processing</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
               </TableCell>
               <TableCell>
                 {new Date(order.created_at).toLocaleDateString()}
