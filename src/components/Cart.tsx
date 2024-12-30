@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { ShoppingCart } from "lucide-react";
 import { CartForm } from "./CartForm";
 import { CartItemList } from "./CartItemList";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface CartItem {
   id: number;
@@ -78,11 +79,15 @@ const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
                   <CartForm 
                     onBack={() => setIsCheckingOut(false)}
                     onComplete={async (customerName) => {
+                      const { data: { user } } = await supabase.auth.getUser();
+                      if (!user) return false;
+
                       const success = await onOrderSubmit(customerName);
                       if (success) {
                         setItems([]);
                         setIsCheckingOut(false);
                       }
+                      return success;
                     }}
                   />
                 )}

@@ -67,6 +67,16 @@ const Index = () => {
 
   const handleOrderSubmit = async (customerName: string) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to place an order.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
       for (const item of cartItems) {
         const { error } = await supabase
           .from('orders')
@@ -75,6 +85,7 @@ const Index = () => {
             quantity: item.quantity,
             total_price: item.price * item.quantity,
             customer_name: customerName,
+            user_id: user.id,
           });
 
         if (error) throw error;
