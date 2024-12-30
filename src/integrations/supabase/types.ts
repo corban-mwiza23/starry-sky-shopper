@@ -36,6 +36,7 @@ export type Database = {
           quantity: number
           status: string | null
           total_price: number
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -45,6 +46,7 @@ export type Database = {
           quantity?: number
           status?: string | null
           total_price: number
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -54,6 +56,7 @@ export type Database = {
           quantity?: number
           status?: string | null
           total_price?: number
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -99,6 +102,24 @@ export type Database = {
           is_on_sale?: boolean | null
           name?: string
           price?: number | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          username?: string | null
         }
         Relationships: []
       }
