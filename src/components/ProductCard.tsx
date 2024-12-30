@@ -33,7 +33,7 @@ const ProductCard = ({ id, name, price, image, onAddToCart }: ProductCardProps) 
           <img
             src={image}
             alt={name}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 border-2 border-white/20"
           />
         </div>
         <div className={`absolute inset-0 bg-gradient-to-t from-cosmic-dark/90 to-transparent transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>

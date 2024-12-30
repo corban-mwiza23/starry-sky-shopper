@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ProductGrid from "@/components/ProductGrid";
 import Cart from "@/components/Cart";
+import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
@@ -108,6 +109,7 @@ const Index = () => {
           </h1>
           <ProductGrid onAddToCart={handleAddToCart} />
         </div>
+        <Footer />
       </div>
     </div>
   );
