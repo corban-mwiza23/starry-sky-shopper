@@ -50,9 +50,9 @@
   10% {
     opacity: 1;
   }
-  20% {
+  50% {
     transform: translate(200px, 200px) rotate(45deg) scale(1);
-    opacity: 0;
+    opacity: 1;
   }
   100% {
     transform: translate(400px, 400px) rotate(45deg) scale(1);
@@ -62,12 +62,12 @@
 
 .shooting-star {
   position: absolute;
-  width: 2px;
-  height: 2px;
+  width: 3px;
+  height: 3px;
   background: linear-gradient(45deg, #F97316, transparent);
   border-radius: 50%;
-  filter: drop-shadow(0 0 6px #F97316);
-  animation: shoot linear forwards;
+  filter: drop-shadow(0 0 10px #F97316);
+  animation: shoot 3s linear infinite;
 }
 
 .shooting-star::before {
@@ -75,7 +75,7 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 50px;
-  height: 1px;
+  width: 100px;
+  height: 2px;
   background: linear-gradient(90deg, #F97316, transparent);
 }

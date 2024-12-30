@@ -18,35 +18,37 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Create shooting stars
-    const createShootingStar = () => {
-      const star = document.createElement('div');
-      star.className = 'shooting-star';
-      
-      // Random position and duration
-      const startX = Math.random() * window.innerWidth;
-      const startY = Math.random() * window.innerHeight;
-      const duration = 1000 + Math.random() * 2000;
-      
-      star.style.left = `${startX}px`;
-      star.style.top = `${startY}px`;
-      star.style.animationDuration = `${duration}ms`;
-      
-      document.getElementById('starfield')?.appendChild(star);
-      
-      // Remove the star after animation
-      setTimeout(() => {
-        star.remove();
-      }, duration);
-    };
+    // Create initial stars
+    for(let i = 0; i < 10; i++) {
+      createShootingStar();
+    }
 
-    // Create stars periodically
+    // Create shooting stars periodically
     const interval = setInterval(() => {
       createShootingStar();
-    }, 2000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
+
+  const createShootingStar = () => {
+    const star = document.createElement('div');
+    star.className = 'shooting-star';
+    
+    // Random position and duration
+    const startX = Math.random() * window.innerWidth;
+    const startY = Math.random() * window.innerHeight;
+    
+    star.style.left = `${startX}px`;
+    star.style.top = `${startY}px`;
+    
+    document.getElementById('starfield')?.appendChild(star);
+    
+    // Remove the star after animation
+    setTimeout(() => {
+      star.remove();
+    }, 3000);
+  };
 
   const handleAddToCart = (productId: number, name: string, price: number, image: string) => {
     setCartItems(prevItems => {
