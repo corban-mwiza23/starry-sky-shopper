@@ -1,10 +1,6 @@
 import NewsletterSignup from "./NewsletterSignup";
-import { Button } from "./ui/button";
-import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
-  const navigate = useNavigate();
-
   return (
     <footer className="mt-20 border-t border-white/10 bg-[#1A1F2C]/50 backdrop-blur-sm">
       <div className="container mx-auto px-4 py-12">
@@ -17,16 +13,10 @@ const Footer = () => {
             <NewsletterSignup />
           </div>
           <div className="text-center md:text-right">
-            <h3 className="text-xl font-semibold text-white mb-4">Your Account</h3>
+            <h3 className="text-xl font-semibold text-white mb-4">About Us</h3>
             <p className="text-white/70 mb-6">
-              Sign in to view your order history and track your deliveries.
+              Discover the universe's finest collection of celestial merchandise.
             </p>
-            <Button
-              onClick={() => navigate("/login")}
-              className="bg-white/20 hover:bg-white/30 text-white"
-            >
-              Sign In
-            </Button>
           </div>
         </div>
       </div>

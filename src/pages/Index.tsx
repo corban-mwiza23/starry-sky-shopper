@@ -2,6 +2,7 @@ import { useState } from "react";
 import ProductGrid from "@/components/ProductGrid";
 import Cart from "@/components/Cart";
 import Footer from "@/components/Footer";
+import NavBar from "@/components/NavBar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
@@ -113,8 +114,9 @@ const Index = () => {
       <div id="starfield" className="fixed inset-0 bg-[#1A1F2C] -z-10 overflow-hidden" />
       
       <div className="relative z-10">
+        <NavBar />
         <Cart items={cartItems} setItems={setCartItems} onOrderSubmit={handleOrderSubmit} />
-        <div className="container mx-auto pt-20">
+        <div className="container mx-auto pt-28">
           <h1 className="text-4xl md:text-6xl font-bold text-white text-center mb-12 animate-fade-in">
             Cosmic Collection
           </h1>
