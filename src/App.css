@@ -40,3 +40,42 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Shooting stars animation */
+@keyframes shoot {
+  0% {
+    transform: translate(0, 0) rotate(45deg) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  20% {
+    transform: translate(200px, 200px) rotate(45deg) scale(1);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(400px, 400px) rotate(45deg) scale(1);
+    opacity: 0;
+  }
+}
+
+.shooting-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: linear-gradient(45deg, #F97316, transparent);
+  border-radius: 50%;
+  filter: drop-shadow(0 0 6px #F97316);
+  animation: shoot linear forwards;
+}
+
+.shooting-star::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 1px;
+  background: linear-gradient(90deg, #F97316, transparent);
+}

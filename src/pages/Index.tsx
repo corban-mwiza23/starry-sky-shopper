@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ProductGrid from "@/components/ProductGrid";
 import Cart from "@/components/Cart";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useEffect } from "react";
 
 interface CartItem {
   id: number;
@@ -13,17 +14,38 @@ interface CartItem {
 }
 
 const Index = () => {
-  const [videoLoaded, setVideoLoaded] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
-    const video = document.getElementById("bgVideo") as HTMLVideoElement;
-    if (video) {
-      video.play().catch((error) => {
-        console.log("Video autoplay failed:", error);
-      });
-    }
+    // Create shooting stars
+    const createShootingStar = () => {
+      const star = document.createElement('div');
+      star.className = 'shooting-star';
+      
+      // Random position and duration
+      const startX = Math.random() * window.innerWidth;
+      const startY = Math.random() * window.innerHeight;
+      const duration = 1000 + Math.random() * 2000;
+      
+      star.style.left = `${startX}px`;
+      star.style.top = `${startY}px`;
+      star.style.animationDuration = `${duration}ms`;
+      
+      document.getElementById('starfield')?.appendChild(star);
+      
+      // Remove the star after animation
+      setTimeout(() => {
+        star.remove();
+      }, duration);
+    };
+
+    // Create stars periodically
+    const interval = setInterval(() => {
+      createShootingStar();
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleAddToCart = (productId: number, name: string, price: number, image: string) => {
@@ -74,24 +96,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen relative">
-      <div className="fixed inset-0 -z-10">
-        <video
-          id="bgVideo"
-          autoPlay
-          muted
-          loop
-          playsInline
-          onLoadedData={() => setVideoLoaded(true)}
-          className="w-full h-full object-cover"
-        >
-          <source
-            src="https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4"
-            type="video/mp4"
-          />
-        </video>
-        <div className="absolute inset-0 bg-cosmic-dark/50 backdrop-blur-xs" />
-      </div>
-
+      <div id="starfield" className="fixed inset-0 bg-[#1A1F2C] -z-10 overflow-hidden" />
+      
       <div className="relative z-10">
         <Cart items={cartItems} setItems={setCartItems} onOrderSubmit={handleOrderSubmit} />
         <div className="container mx-auto pt-20">
