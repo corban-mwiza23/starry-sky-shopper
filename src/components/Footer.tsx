@@ -2,21 +2,25 @@ import NewsletterSignup from "./NewsletterSignup";
 
 const Footer = () => {
   return (
-    <footer className="mt-20 border-t border-white/10 bg-[#1A1F2C]/50 backdrop-blur-sm">
+    <footer className="mt-20 bg-black text-white">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="text-center md:text-left">
-            <h3 className="text-xl font-semibold text-white mb-4">Stay Updated</h3>
-            <p className="text-white/70 mb-6">
-              Subscribe to our newsletter for the latest products and cosmic deals!
-            </p>
+        <div className="flex flex-col items-center justify-center space-y-8">
+          <div className="text-center max-w-md">
+            <h3 className="text-xl font-mono mb-4">Sign up for updates</h3>
             <NewsletterSignup />
           </div>
-          <div className="text-center md:text-right">
-            <h3 className="text-xl font-semibold text-white mb-4">About Us</h3>
-            <p className="text-white/70 mb-6">
-              Discover the universe's finest collection of celestial merchandise.
-            </p>
+          
+          <div className="flex items-center justify-center mt-8">
+            <img 
+              src="/lovable-uploads/0116fb29-5a66-4eaf-8090-11a0bed3adba.png" 
+              alt="PayPal" 
+              className="h-8 w-auto"
+            />
+          </div>
+          
+          <div className="text-center space-y-2 font-mono text-sm text-white/80">
+            <p>Copyright © 2024, ADAMS THEME</p>
+            <p>Theme By Adam's Mockups</p>
           </div>
         </div>
       </div>

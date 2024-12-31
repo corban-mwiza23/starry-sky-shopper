@@ -5,6 +5,7 @@ import NavBar from "@/components/NavBar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 interface CartItem {
   id: number;
@@ -17,39 +18,15 @@ interface CartItem {
 const Index = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { toast } = useToast();
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
-    // Create initial stars
-    for(let i = 0; i < 10; i++) {
-      createShootingStar();
-    }
-
-    // Create shooting stars periodically
-    const interval = setInterval(() => {
-      createShootingStar();
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(timer);
   }, []);
-
-  const createShootingStar = () => {
-    const star = document.createElement('div');
-    star.className = 'shooting-star';
-    
-    // Random position and duration
-    const startX = Math.random() * window.innerWidth;
-    const startY = Math.random() * window.innerHeight;
-    
-    star.style.left = `${startX}px`;
-    star.style.top = `${startY}px`;
-    
-    document.getElementById('starfield')?.appendChild(star);
-    
-    // Remove the star after animation
-    setTimeout(() => {
-      star.remove();
-    }, 3000);
-  };
 
   const handleAddToCart = (productId: number, name: string, price: number, image: string) => {
     setCartItems(prevItems => {
@@ -109,22 +86,57 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen relative">
-      <div id="starfield" className="fixed inset-0 bg-[#1A1F2C] -z-10 overflow-hidden" />
+    <div className="min-h-screen relative bg-black">
+      {/* Video Background */}
+      <div className="fixed inset-0 w-full h-full z-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+        >
+          <source src="https://youtu.be/3JbBbY4S11w" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-black/50" /> {/* Overlay to ensure content is readable */}
+      </div>
       
-      <div className="relative z-10">
-        <NavBar 
-          cartItems={cartItems} 
-          setCartItems={setCartItems} 
-          onOrderSubmit={handleOrderSubmit} 
-        />
-        <div className="container mx-auto pt-28">
-          <h1 className="text-4xl md:text-6xl font-bold text-white text-center mb-12 animate-fade-in">
-            Cosmic Collection
-          </h1>
-          <ProductGrid onAddToCart={handleAddToCart} />
+      <NavBar 
+        cartItems={cartItems} 
+        setCartItems={setCartItems} 
+        onOrderSubmit={handleOrderSubmit} 
+      />
+
+      <div className="flex relative z-10">
+        {/* Side Navigation */}
+        <div className="fixed left-0 top-0 pt-24 w-48 h-full bg-black/50 backdrop-blur-sm border-r border-white/10">
+          <div className="flex flex-col space-y-4 p-4 text-white/80">
+            <Link to="/" className="hover:text-white transition-colors">New</Link>
+            <Link to="/" className="hover:text-white transition-colors">Hoodies</Link>
+            <Link to="/" className="hover:text-white transition-colors">Tees</Link>
+            <Link to="/" className="hover:text-white transition-colors">Jackets</Link>
+            <Link to="/" className="hover:text-white transition-colors">Pants</Link>
+            <Link to="/" className="hover:text-white transition-colors">Skate</Link>
+          </div>
         </div>
-        <Footer />
+
+        {/* Main Content */}
+        <div className="flex-1 ml-48">
+          <div className="container mx-auto pt-24 px-8">
+            <div className="text-white/60 text-sm mb-8 text-right">
+              {currentTime.toLocaleString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+              })}
+            </div>
+            <ProductGrid onAddToCart={handleAddToCart} />
+          </div>
+        </div>
       </div>
     </div>
   );
