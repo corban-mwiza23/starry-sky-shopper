@@ -43,11 +43,11 @@ const ProductGrid = ({ onAddToCart }: ProductGridProps) => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {[...Array(4)].map((_, index) => (
           <div 
             key={index}
-            className="h-[200px] bg-cosmic-dark/30 animate-pulse rounded-lg"
+            className="h-[300px] bg-white/5 animate-pulse rounded-lg"
           />
         ))}
       </div>
@@ -55,7 +55,7 @@ const ProductGrid = ({ onAddToCart }: ProductGridProps) => {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
       {products.map((product) => (
         <ProductCard
           key={product.id}
