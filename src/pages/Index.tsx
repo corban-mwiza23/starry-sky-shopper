@@ -87,7 +87,19 @@ const Index = () => {
 
   return (
     <div className="min-h-screen relative bg-black">
-      <div className="fixed inset-0 bg-[url('/lovable-uploads/512c81b5-f781-46ab-b6ec-1e5a2b4b908f.png')] bg-cover bg-center opacity-10 pointer-events-none" />
+      {/* Video Background */}
+      <div className="fixed inset-0 w-full h-full z-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+        >
+          <source src="https://youtu.be/3JbBbY4S11w" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-black/50" /> {/* Overlay to ensure content is readable */}
+      </div>
       
       <NavBar 
         cartItems={cartItems} 
@@ -95,7 +107,7 @@ const Index = () => {
         onOrderSubmit={handleOrderSubmit} 
       />
 
-      <div className="flex">
+      <div className="flex relative z-10">
         {/* Side Navigation */}
         <div className="fixed left-0 top-0 pt-24 w-48 h-full bg-black/50 backdrop-blur-sm border-r border-white/10">
           <div className="flex flex-col space-y-4 p-4 text-white/80">

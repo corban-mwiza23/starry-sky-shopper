@@ -3,6 +3,12 @@ import { Button } from "./ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import Cart, { CartItem } from "./Cart";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 interface NavBarProps {
   cartItems: CartItem[];
@@ -48,18 +54,26 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
         <div className="flex items-center gap-4">
           <Cart items={cartItems} setItems={setCartItems} onOrderSubmit={onOrderSubmit} />
           {username ? (
-            <>
-              <span className="text-white/90 bg-white/5 px-4 py-2 rounded-lg border border-white/10">
-                {username}
-              </span>
-              <Button 
-                variant="outline" 
-                onClick={handleSignOut}
-                className="text-white border-white/20 hover:bg-white/10 transition-colors duration-200"
-              >
-                Sign Out
-              </Button>
-            </>
+            <HoverCard>
+              <HoverCardTrigger>
+                <Avatar className="cursor-pointer">
+                  <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${username}`} />
+                  <AvatarFallback>{username?.charAt(0).toUpperCase()}</AvatarFallback>
+                </Avatar>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-auto p-2">
+                <div className="flex flex-col gap-2">
+                  <span className="text-sm text-muted-foreground">{username}</span>
+                  <Button 
+                    variant="outline" 
+                    onClick={handleSignOut}
+                    className="text-white border-white/20 hover:bg-white/10 transition-colors duration-200"
+                  >
+                    Sign Out
+                  </Button>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
           ) : (
             <Button
               onClick={() => navigate("/login")}
