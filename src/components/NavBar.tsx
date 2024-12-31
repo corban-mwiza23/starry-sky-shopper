@@ -2,8 +2,15 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import Cart, { CartItem } from "./Cart";
 
-const NavBar = () => {
+interface NavBarProps {
+  cartItems: CartItem[];
+  setCartItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
+  onOrderSubmit: (customerName: string) => Promise<boolean>;
+}
+
+const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string | null>(null);
 
@@ -34,6 +41,7 @@ const NavBar = () => {
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-white">Cosmic Collection</h1>
         <div className="flex items-center gap-4">
+          <Cart items={cartItems} setItems={setCartItems} onOrderSubmit={onOrderSubmit} />
           {username ? (
             <>
               <span className="text-white">{username}</span>
