@@ -40,7 +40,7 @@ interface Order {
     city: string;
     zip_code: string;
     email: string;
-  } | null;
+  }[] | null; // Changed to array or null to match Supabase's return type
 }
 
 const OrdersTable = () => {
@@ -135,12 +135,12 @@ const OrdersTable = () => {
                 <div>
                   <div>{order.customer_name}</div>
                   <div className="text-sm text-muted-foreground">
-                    {order.shipping_addresses?.email}
+                    {order.shipping_addresses?.[0]?.email}
                   </div>
                 </div>
               </TableCell>
               <TableCell>
-                {order.shipping_addresses ? (
+                {order.shipping_addresses?.[0] ? (
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
@@ -151,8 +151,8 @@ const OrdersTable = () => {
                       </TooltipTrigger>
                       <TooltipContent>
                         <div className="text-sm">
-                          <p>{order.shipping_addresses.address}</p>
-                          <p>{order.shipping_addresses.city}, {order.shipping_addresses.zip_code}</p>
+                          <p>{order.shipping_addresses[0].address}</p>
+                          <p>{order.shipping_addresses[0].city}, {order.shipping_addresses[0].zip_code}</p>
                         </div>
                       </TooltipContent>
                     </Tooltip>
