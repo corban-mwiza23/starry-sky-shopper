@@ -16,6 +16,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { MapPin } from "lucide-react";
 
 interface Order {
   id: number;
@@ -28,6 +35,12 @@ interface Order {
   products: {
     name: string;
   };
+  shipping_addresses: {
+    address: string;
+    city: string;
+    zip_code: string;
+    email: string;
+  } | null;
 }
 
 const OrdersTable = () => {
@@ -42,6 +55,12 @@ const OrdersTable = () => {
           *,
           products!orders_product_id_fkey (
             name
+          ),
+          shipping_addresses!shipping_addresses_order_id_fkey (
+            address,
+            city,
+            zip_code,
+            email
           )
         `)
         .order('created_at', { ascending: false });
@@ -100,6 +119,7 @@ const OrdersTable = () => {
             <TableHead>Order ID</TableHead>
             <TableHead>Product</TableHead>
             <TableHead>Customer</TableHead>
+            <TableHead>Shipping</TableHead>
             <TableHead>Quantity</TableHead>
             <TableHead>Total</TableHead>
             <TableHead>Status</TableHead>
@@ -111,7 +131,36 @@ const OrdersTable = () => {
             <TableRow key={order.id}>
               <TableCell>#{order.id}</TableCell>
               <TableCell>{order.products?.name}</TableCell>
-              <TableCell>{order.customer_name}</TableCell>
+              <TableCell>
+                <div>
+                  <div>{order.customer_name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {order.shipping_addresses?.email}
+                  </div>
+                </div>
+              </TableCell>
+              <TableCell>
+                {order.shipping_addresses ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <MapPin className="h-4 w-4" />
+                          <span>View Address</span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <div className="text-sm">
+                          <p>{order.shipping_addresses.address}</p>
+                          <p>{order.shipping_addresses.city}, {order.shipping_addresses.zip_code}</p>
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <span className="text-muted-foreground">No address</span>
+                )}
+              </TableCell>
               <TableCell>{order.quantity}</TableCell>
               <TableCell>${order.total_price.toFixed(2)}</TableCell>
               <TableCell>
