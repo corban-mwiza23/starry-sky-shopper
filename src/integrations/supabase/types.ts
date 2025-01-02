@@ -123,6 +123,50 @@ export type Database = {
         }
         Relationships: []
       }
+      shipping_addresses: {
+        Row: {
+          address: string
+          city: string
+          created_at: string | null
+          email: string
+          id: number
+          name: string
+          order_id: number | null
+          user_id: string | null
+          zip_code: string
+        }
+        Insert: {
+          address: string
+          city: string
+          created_at?: string | null
+          email: string
+          id?: number
+          name: string
+          order_id?: number | null
+          user_id?: string | null
+          zip_code: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          created_at?: string | null
+          email?: string
+          id?: number
+          name?: string
+          order_id?: number | null
+          user_id?: string | null
+          zip_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipping_addresses_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
