@@ -7,6 +7,8 @@ interface Product {
   name: string;
   price: number;
   image: string;
+  discount_percentage?: number | null;
+  is_on_sale?: boolean | null;
 }
 
 interface ProductGridProps {
