@@ -22,15 +22,23 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
 
   useEffect(() => {
     const getProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('id', user.id)
-          .single();
-        
-        setUsername(profile?.username || user.email);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('username')
+            .eq('id', user.id)
+            .maybeSingle();
+          
+          setUsername(profile?.username || user.email);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setUsername(user.email);
+        }
       }
     };
 

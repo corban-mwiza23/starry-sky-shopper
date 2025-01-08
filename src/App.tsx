@@ -7,13 +7,20 @@ import Login from "@/pages/Login";
 import { Toaster } from "@/components/ui/toaster";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check initial auth state
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setIsAuthenticated(!!session);
+      } catch (error) {
+        console.error('Auth check error:', error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     
     checkAuth();
@@ -27,7 +34,7 @@ function App() {
   }, []);
 
   // Show loading state while checking auth
-  if (isAuthenticated === null) {
+  if (isLoading) {
     return <div className="min-h-screen bg-[#1A1F2C]" />;
   }
 
