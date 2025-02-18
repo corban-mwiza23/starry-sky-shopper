@@ -43,11 +43,11 @@ const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
         <Button 
           variant="outline" 
           size="icon" 
-          className="fixed sm:bottom-6 sm:right-6 bottom-4 right-4 z-50 bg-cosmic-dark/50 backdrop-blur-sm border-white/20 hover:bg-cosmic-dark/70 shadow-lg sm:h-12 sm:w-12 h-10 w-10 transition-all duration-300"
+          className="relative bg-cosmic-dark/50 backdrop-blur-sm border-white/20 hover:bg-cosmic-dark/70 shadow-lg h-10 w-10 transition-all duration-300"
         >
-          <ShoppingCart className="h-4 w-4 text-white sm:h-5 sm:w-5" />
+          <ShoppingCart className="h-4 w-4 text-white" />
           {items.length > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center sm:w-6 sm:h-6 sm:text-sm">
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {items.length}
             </span>
           )}
