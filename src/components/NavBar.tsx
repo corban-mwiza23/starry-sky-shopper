@@ -1,14 +1,8 @@
+
 import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
 import Cart, { CartItem } from "./Cart";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
 
 interface NavBarProps {
   cartItems: CartItem[];
@@ -18,37 +12,6 @@ interface NavBarProps {
 
 const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState<string | null>(null);
-
-  useEffect(() => {
-    const getProfile = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('username')
-            .eq('id', user.id)
-            .maybeSingle();
-          
-          setUsername(profile?.username || user.email);
-        }
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          setUsername(user.email);
-        }
-      }
-    };
-
-    getProfile();
-  }, []);
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/login');
-  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1A1F2C]/80 backdrop-blur-sm border-b border-white/10">
@@ -61,35 +24,12 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
         </h1>
         <div className="flex items-center gap-4">
           <Cart items={cartItems} setItems={setCartItems} onOrderSubmit={onOrderSubmit} />
-          {username ? (
-            <HoverCard>
-              <HoverCardTrigger>
-                <Avatar className="cursor-pointer">
-                  <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${username}`} />
-                  <AvatarFallback>{username?.charAt(0).toUpperCase()}</AvatarFallback>
-                </Avatar>
-              </HoverCardTrigger>
-              <HoverCardContent className="w-auto p-2">
-                <div className="flex flex-col gap-2">
-                  <span className="text-sm text-muted-foreground">{username}</span>
-                  <Button 
-                    variant="outline" 
-                    onClick={handleSignOut}
-                    className="text-white border-white/20 hover:bg-white/10 transition-colors duration-200"
-                  >
-                    Sign Out
-                  </Button>
-                </div>
-              </HoverCardContent>
-            </HoverCard>
-          ) : (
-            <Button
-              onClick={() => navigate("/login")}
-              className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white border-none transition-all duration-200"
-            >
-              Sign In
-            </Button>
-          )}
+          <Button
+            onClick={() => navigate("/login")}
+            className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white border-none transition-all duration-200"
+          >
+            Sign In
+          </Button>
         </div>
       </div>
     </nav>
