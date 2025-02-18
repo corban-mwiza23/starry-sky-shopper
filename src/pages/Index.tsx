@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import ProductGrid from "@/components/ProductGrid";
 import Footer from "@/components/Footer";
@@ -98,7 +99,7 @@ const Index = () => {
         >
           <source src="https://youtu.be/3JbBbY4S11w" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-black/50" /> {/* Overlay to ensure content is readable */}
+        <div className="absolute inset-0 bg-black/50" />
       </div>
       
       <NavBar 
@@ -107,22 +108,22 @@ const Index = () => {
         onOrderSubmit={handleOrderSubmit} 
       />
 
-      <div className="flex relative z-10">
+      <div className="flex flex-col md:flex-row relative z-10">
         {/* Side Navigation */}
-        <div className="fixed left-0 top-0 pt-24 w-48 h-full bg-black/50 backdrop-blur-sm border-r border-white/10">
-          <div className="flex flex-col space-y-4 p-4 text-white/80">
-            <Link to="/" className="hover:text-white transition-colors">New</Link>
-            <Link to="/" className="hover:text-white transition-colors">Hoodies</Link>
-            <Link to="/" className="hover:text-white transition-colors">Tees</Link>
-            <Link to="/" className="hover:text-white transition-colors">Jackets</Link>
-            <Link to="/" className="hover:text-white transition-colors">Pants</Link>
-            <Link to="/" className="hover:text-white transition-colors">Skate</Link>
+        <div className="md:fixed md:left-0 md:top-0 md:pt-24 md:w-48 md:h-full bg-black/50 backdrop-blur-sm border-b md:border-b-0 md:border-r border-white/10">
+          <div className="flex md:flex-col overflow-x-auto md:overflow-x-visible whitespace-nowrap md:whitespace-normal p-4 space-x-4 md:space-x-0 md:space-y-4 text-white/80">
+            <Link to="/" className="hover:text-white transition-colors md:text-left px-4 md:px-0">New</Link>
+            <Link to="/" className="hover:text-white transition-colors md:text-left px-4 md:px-0">Hoodies</Link>
+            <Link to="/" className="hover:text-white transition-colors md:text-left px-4 md:px-0">Tees</Link>
+            <Link to="/" className="hover:text-white transition-colors md:text-left px-4 md:px-0">Jackets</Link>
+            <Link to="/" className="hover:text-white transition-colors md:text-left px-4 md:px-0">Pants</Link>
+            <Link to="/" className="hover:text-white transition-colors md:text-left px-4 md:px-0">Skate</Link>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 ml-48">
-          <div className="container mx-auto pt-24 px-8">
+        <div className="flex-1 md:ml-48 w-full">
+          <div className="container mx-auto pt-24 px-4 sm:px-6 lg:px-8">
             <div className="text-white/60 text-sm mb-8 text-right">
               {currentTime.toLocaleString('en-US', {
                 year: 'numeric',
