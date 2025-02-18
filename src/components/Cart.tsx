@@ -43,23 +43,26 @@ const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
         <Button 
           variant="outline" 
           size="icon" 
-          className="fixed bottom-4 right-4 z-50 bg-cosmic-dark/50 backdrop-blur-sm border-white/20 hover:bg-cosmic-dark/70 shadow-lg"
+          className="fixed sm:bottom-6 sm:right-6 bottom-4 right-4 z-50 bg-cosmic-dark/50 backdrop-blur-sm border-white/20 hover:bg-cosmic-dark/70 shadow-lg sm:h-12 sm:w-12 h-10 w-10 transition-all duration-300"
         >
-          <ShoppingCart className="h-4 w-4 text-white" />
+          <ShoppingCart className="h-4 w-4 text-white sm:h-5 sm:w-5" />
           {items.length > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center sm:w-6 sm:h-6 sm:text-sm">
               {items.length}
             </span>
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="bg-cosmic-dark/95 backdrop-blur-sm border-white/20 overflow-y-auto">
+      <SheetContent 
+        className="bg-cosmic-dark/95 backdrop-blur-sm border-white/20 overflow-y-auto w-full sm:max-w-md md:max-w-lg"
+        side="right"
+      >
         <SheetHeader>
-          <SheetTitle className="text-white">Your Cart</SheetTitle>
+          <SheetTitle className="text-white text-lg sm:text-xl md:text-2xl">Your Cart</SheetTitle>
         </SheetHeader>
         <div className="mt-8">
           {items.length === 0 ? (
-            <p className="text-cosmic-light">Your cart is empty</p>
+            <p className="text-cosmic-light text-base sm:text-lg">Your cart is empty</p>
           ) : (
             <>
               <CartItemList 
@@ -67,12 +70,14 @@ const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
                 onUpdateQuantity={handleUpdateQuantity}
                 onRemoveItem={handleRemoveItem}
               />
-              <div className="mt-6">
-                <p className="text-white text-lg font-semibold">Total: ${total.toFixed(2)}</p>
+              <div className="mt-6 sticky bottom-0 bg-cosmic-dark/95 backdrop-blur-sm p-4 border-t border-white/10">
+                <p className="text-white text-lg sm:text-xl font-semibold">
+                  Total: ${total.toFixed(2)}
+                </p>
                 {!isCheckingOut ? (
                   <Button 
                     onClick={() => setIsCheckingOut(true)}
-                    className="w-full mt-4 bg-white text-cosmic-dark hover:bg-cosmic-light"
+                    className="w-full mt-4 bg-white text-cosmic-dark hover:bg-cosmic-light sm:py-6 text-base sm:text-lg"
                   >
                     Proceed to Checkout
                   </Button>
