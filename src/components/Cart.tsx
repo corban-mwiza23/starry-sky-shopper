@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -42,7 +43,7 @@ const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
         <Button 
           variant="outline" 
           size="icon" 
-          className="fixed top-4 right-4 bg-cosmic-dark/50 backdrop-blur-sm border-white/20 hover:bg-cosmic-dark/70"
+          className="fixed bottom-4 right-4 z-50 bg-cosmic-dark/50 backdrop-blur-sm border-white/20 hover:bg-cosmic-dark/70 shadow-lg"
         >
           <ShoppingCart className="h-4 w-4 text-white" />
           {items.length > 0 && (
