@@ -54,22 +54,33 @@ const Account = () => {
         setUsername(profile?.username || "");
         setEmail(user.email || "");
 
-        const { data: orderData, error } = await supabase
+        // First get the orders
+        const { data: orderData, error: orderError } = await supabase
           .from('orders')
-          .select(`
-            *,
-            products:product_id(name)
-          `)
+          .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
 
-        if (error) {
-          throw error;
-        }
+        if (orderError) throw orderError;
+        if (!orderData) return;
 
-        if (orderData) {
-          setOrders(orderData as Order[]);
-        }
+        // Then fetch product names for each order
+        const ordersWithProducts = await Promise.all(
+          orderData.map(async (order) => {
+            const { data: productData } = await supabase
+              .from('products')
+              .select('name')
+              .eq('id', order.product_id)
+              .single();
+
+            return {
+              ...order,
+              products: { name: productData?.name || 'Unknown Product' }
+            };
+          })
+        );
+
+        setOrders(ordersWithProducts);
       } catch (error) {
         console.error('Error fetching profile:', error);
         toast({
