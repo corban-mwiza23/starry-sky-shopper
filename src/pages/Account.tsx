@@ -54,11 +54,18 @@ const Account = () => {
         setUsername(profile?.username || "");
         setEmail(user.email || "");
 
-        const { data: orderData } = await supabase
+        const { data: orderData, error } = await supabase
           .from('orders')
-          .select('*, products:product_id(name)')
+          .select(`
+            *,
+            products:product_id(name)
+          `)
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
+
+        if (error) {
+          throw error;
+        }
 
         if (orderData) {
           setOrders(orderData as Order[]);
