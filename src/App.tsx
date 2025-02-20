@@ -1,9 +1,11 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "@/pages/Index";
 import Admin from "@/pages/Admin";
 import Login from "@/pages/Login";
+import Account from "@/pages/Account";
 import { Toaster } from "@/components/ui/toaster";
 
 function App() {
@@ -52,6 +54,10 @@ function App() {
         <Route 
           path="/admin" 
           element={isAuthenticated ? <Admin /> : <Navigate to="/login" />} 
+        />
+        <Route 
+          path="/account" 
+          element={isAuthenticated ? <Account /> : <Navigate to="/login" />} 
         />
       </Routes>
       <Toaster />
