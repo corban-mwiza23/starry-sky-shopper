@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -18,6 +19,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        miralone: ["Miralone", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         background: "hsl(var(--background))",

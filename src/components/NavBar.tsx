@@ -49,19 +49,19 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1A1F2C]/80 backdrop-blur-sm border-b border-white/10">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#121212]/90 backdrop-blur-sm border-b border-white/10">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <img 
-            src="/lovable-uploads/761c3dec-7031-4392-b6d8-70525efd46e2.png" 
+            src="/lovable-uploads/millicado-spider-logo.png" 
             alt="Millicado Logo" 
             className="h-9 w-auto"
           />
           <h1 
             onClick={() => navigate('/')} 
-            className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent cursor-pointer hover:from-purple-500 hover:to-pink-700 transition-all"
+            className="text-2xl font-bold font-miralone bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent cursor-pointer hover:from-purple-500 hover:to-pink-700 transition-all"
           >
-            Cosmic Collection
+            Millicado
           </h1>
         </div>
         <div className="flex items-center gap-4">
@@ -74,7 +74,7 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
                   <AvatarFallback>{username?.charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
               </HoverCardTrigger>
-              <HoverCardContent className="w-64">
+              <HoverCardContent className="w-64 bg-[#121212] border border-white/10">
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-3">
                     <Avatar>
@@ -82,13 +82,13 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
                       <AvatarFallback>{username?.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium">{username}</span>
+                      <span className="text-sm font-medium font-miralone">{username}</span>
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
                     <Button 
                       variant="outline" 
-                      className="w-full justify-start gap-2"
+                      className="w-full justify-start gap-2 font-miralone"
                       onClick={() => navigate('/account')}
                     >
                       <UserCircle className="h-4 w-4" />
@@ -97,7 +97,7 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
                     <Button 
                       variant="outline" 
                       onClick={handleSignOut}
-                      className="w-full text-white border-white/20 hover:bg-white/10 transition-colors duration-200"
+                      className="w-full text-white border-white/20 hover:bg-white/10 transition-colors duration-200 font-miralone"
                     >
                       Sign Out
                     </Button>
@@ -108,7 +108,7 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
           ) : (
             <Button
               onClick={() => navigate("/login")}
-              className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white border-none transition-all duration-200"
+              className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white border-none transition-all duration-200 font-miralone"
             >
               Sign In
             </Button>

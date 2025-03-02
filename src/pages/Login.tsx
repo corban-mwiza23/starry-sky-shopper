@@ -19,23 +19,25 @@ const customStyles = {
   button: {
     backgroundColor: "rgb(124, 58, 237)",
     color: "white",
-    fontFamily: "monospace",
+    fontFamily: "Miralone, monospace",
   },
   anchor: {
     color: "rgb(156, 163, 175)",
+    fontFamily: "Miralone, sans-serif",
   },
   input: {
     backgroundColor: "rgba(255, 255, 255, 0.1)",
     color: "white",
     border: "1px solid rgba(255, 255, 255, 0.2)",
+    fontFamily: "Miralone, sans-serif",
   },
   label: {
     color: "white",
-    fontFamily: "monospace",
+    fontFamily: "Miralone, sans-serif",
   },
   message: {
     color: "white",
-    fontFamily: "monospace",
+    fontFamily: "Miralone, sans-serif",
   },
 };
 
@@ -74,7 +76,7 @@ const Login = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 bg-black text-white relative overflow-hidden">
+    <div className="min-h-screen flex flex-col justify-center py-12 bg-[#121212] text-white relative overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-fuchsia-900/20 z-0"></div>
       <div className="star-container absolute inset-0 z-0"></div>
@@ -82,12 +84,12 @@ const Login = () => {
       <div className="relative z-10 px-4">
         <div className="text-center mb-6">
           <img 
-            src="/lovable-uploads/761c3dec-7031-4392-b6d8-70525efd46e2.png" 
+            src="/lovable-uploads/millicado-spider-logo.png" 
             alt="Millicado Logo" 
             className="h-28 w-auto mx-auto mb-4"
           />
-          <h1 className="text-3xl font-bold font-mono mb-2">COSMIC APPAREL</h1>
-          <p className="text-gray-400 font-mono">Sign in to continue</p>
+          <h1 className="text-3xl font-bold font-miralone mb-2 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">MILLICADO</h1>
+          <p className="text-gray-400 font-miralone">Sign in to continue</p>
         </div>
         
         <Auth
