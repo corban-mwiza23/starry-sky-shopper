@@ -1,10 +1,4 @@
 
-// Fix the :hover syntax issue in the Login page
-// Replace the invalid CSS hover syntax with a proper className
-
-// Since we can't see the source code for Login.tsx (it's read-only), 
-// let's create a CSS module that we can import in Login.tsx
-
 import { useEffect } from "react";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
@@ -86,7 +80,12 @@ const Login = () => {
       <div className="star-container absolute inset-0 z-0"></div>
       
       <div className="relative z-10 px-4">
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
+          <img 
+            src="/lovable-uploads/761c3dec-7031-4392-b6d8-70525efd46e2.png" 
+            alt="Millicado Logo" 
+            className="h-28 w-auto mx-auto mb-4"
+          />
           <h1 className="text-3xl font-bold font-mono mb-2">COSMIC APPAREL</h1>
           <p className="text-gray-400 font-mono">Sign in to continue</p>
         </div>

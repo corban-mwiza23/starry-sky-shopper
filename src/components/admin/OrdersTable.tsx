@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Table,
@@ -16,171 +17,169 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { MapPin } from "lucide-react";
 import { Order } from "@/types/supabase";
 
 interface ExtendedOrder extends Order {
-  shipping_addresses?: {
-    address: string;
-    city: string;
-    zip_code: string;
-    email: string;
-  }[] | null;
+  products: {
+    name: string;
+  };
 }
 
 const OrdersTable = () => {
   const [orders, setOrders] = useState<ExtendedOrder[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      const { data, error } = await supabase
-        .from('orders')
-        .select(`
-          *,
-          products (
-            name
-          ),
-          shipping_addresses (
-            address,
-            city,
-            zip_code,
-            email
-          )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching orders:', error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch orders",
-          variant: "destructive",
-        });
-      } else {
-        setOrders(data as ExtendedOrder[]);
-      }
-    };
-
     fetchOrders();
 
-    // Set up real-time subscription
+    // Subscribe to orders changes
     const subscription = supabase
-      .channel('orders_channel')
+      .channel('orders_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, fetchOrders)
       .subscribe();
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, []);
 
-  const updateOrderStatus = async (orderId: number, newStatus: string) => {
-    const { error } = await supabase
-      .from('orders')
-      .update({ status: newStatus })
-      .eq('id', orderId);
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      // First fetch all orders
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (error) {
+      if (orderError) throw orderError;
+      if (!orderData) return;
+
+      // Then fetch product names for each order
+      const ordersWithProducts = await Promise.all(
+        orderData.map(async (order) => {
+          const { data: productData } = await supabase
+            .from('products')
+            .select('name')
+            .eq('id', order.product_id)
+            .single();
+
+          return {
+            ...order,
+            products: { 
+              name: productData?.name || 'Unknown Product' 
+            }
+          } as ExtendedOrder;
+        })
+      );
+
+      setOrders(ordersWithProducts);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load orders",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateOrderStatus = async (orderId: number, status: string) => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status })
+        .eq('id', orderId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Status Updated",
+        description: `Order #${orderId} status changed to ${status}`,
+      });
+
+      // Refresh orders
+      fetchOrders();
+    } catch (error) {
       console.error('Error updating order status:', error);
       toast({
         title: "Error",
         description: "Failed to update order status",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Success",
-        description: "Order status updated successfully",
-      });
     }
   };
 
   return (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Order ID</TableHead>
-            <TableHead>Product</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Shipping</TableHead>
-            <TableHead>Quantity</TableHead>
-            <TableHead>Total</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Date</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {orders.map((order) => (
-            <TableRow key={order.id}>
-              <TableCell>#{order.id}</TableCell>
-              <TableCell>{order.products?.name}</TableCell>
-              <TableCell>
-                <div>
-                  <div>{order.customer_name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {order.shipping_addresses?.[0]?.email}
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                {order.shipping_addresses?.[0] ? (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <MapPin className="h-4 w-4" />
-                          <span>View Address</span>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <div className="text-sm">
-                          <p>{order.shipping_addresses[0].address}</p>
-                          <p>{order.shipping_addresses[0].city}, {order.shipping_addresses[0].zip_code}</p>
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                ) : (
-                  <span className="text-muted-foreground">No address</span>
-                )}
-              </TableCell>
-              <TableCell>{order.quantity}</TableCell>
-              <TableCell>${order.total_price.toFixed(2)}</TableCell>
-              <TableCell>
-                <Select
-                  defaultValue={order.status}
-                  onValueChange={(value) => updateOrderStatus(order.id, value)}
-                >
-                  <SelectTrigger className={`w-[130px] ${
-                    order.status === 'completed' ? 'bg-green-100 text-green-800' :
-                    order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="processing">Processing</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                  </SelectContent>
-                </Select>
-              </TableCell>
-              <TableCell>
-                {new Date(order.created_at).toLocaleDateString()}
-              </TableCell>
+    <div className="relative overflow-x-auto">
+      {loading ? (
+        <div className="flex justify-center items-center p-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Order ID</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Product</TableHead>
+              <TableHead>Quantity</TableHead>
+              <TableHead>Total</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {orders.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8">
+                  No orders found
+                </TableCell>
+              </TableRow>
+            ) : (
+              orders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell>#{order.id}</TableCell>
+                  <TableCell>{order.customer_name}</TableCell>
+                  <TableCell>{order.products.name}</TableCell>
+                  <TableCell>{order.quantity}</TableCell>
+                  <TableCell>${order.total_price}</TableCell>
+                  <TableCell>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      order.status === 'completed' ? 'bg-green-100 text-green-800' :
+                      order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {order.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <Select
+                      defaultValue={order.status}
+                      onValueChange={(value) => updateOrderStatus(order.id, value)}
+                    >
+                      <SelectTrigger className="w-[120px]">
+                        <SelectValue placeholder="Change status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="processing">Processing</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 };

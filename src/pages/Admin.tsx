@@ -95,7 +95,15 @@ const Admin = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-[1400px] mx-auto p-8">
-        <h1 className="text-3xl font-bold text-foreground mb-8">Sales Dashboard</h1>
+        <div className="flex items-center justify-center mb-8">
+          <img 
+            src="/lovable-uploads/761c3dec-7031-4392-b6d8-70525efd46e2.png" 
+            alt="Millicado Logo" 
+            className="h-20 w-auto"
+          />
+        </div>
+        
+        <h1 className="text-3xl font-bold text-foreground mb-8 text-center">Sales Dashboard</h1>
         
         <div className="grid gap-8">
           {/* Stats Cards */}
