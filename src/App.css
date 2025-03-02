@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -64,10 +65,11 @@
   position: absolute;
   width: 3px;
   height: 3px;
-  background: linear-gradient(45deg, #F97316, transparent);
+  background: linear-gradient(45deg, #C084FC, transparent);
   border-radius: 50%;
-  filter: drop-shadow(0 0 10px #F97316);
+  filter: drop-shadow(0 0 10px #C084FC);
   animation: shoot 3s linear infinite;
+  z-index: 1;
 }
 
 .shooting-star::before {
@@ -77,5 +79,5 @@
   transform: translateY(-50%);
   width: 100px;
   height: 2px;
-  background: linear-gradient(90deg, #F97316, transparent);
+  background: linear-gradient(90deg, #C084FC, transparent);
 }
