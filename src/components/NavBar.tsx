@@ -59,7 +59,7 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
           />
           <h1 
             onClick={() => navigate('/')} 
-            className="text-2xl font-bold font-miralone bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent cursor-pointer hover:from-purple-500 hover:to-pink-700 transition-all"
+            className="text-2xl font-bold font-revans bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent cursor-pointer hover:from-purple-500 hover:to-pink-700 transition-all"
           >
             Millicado
           </h1>

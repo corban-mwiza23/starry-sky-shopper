@@ -88,7 +88,7 @@ const Login = () => {
             alt="Millicado Logo" 
             className="h-28 w-auto mx-auto mb-4"
           />
-          <h1 className="text-3xl font-bold font-miralone mb-2 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">MILLICADO</h1>
+          <h1 className="text-3xl font-bold font-revans mb-2 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">MILLICADO</h1>
           <p className="text-gray-400 font-miralone">Sign in to continue</p>
         </div>
         

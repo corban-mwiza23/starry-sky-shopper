@@ -56,7 +56,7 @@ const Footer = () => {
             </div>
             
             <div className="text-center space-y-2 font-miralone text-sm text-white/80">
-              <p>Copyright © 2024, MILLICADO</p>
+              <p>Copyright © 2024, <span className="font-revans">MILLICADO</span></p>
               <p>Theme By Millicado Designs</p>
             </div>
           </div>

@@ -21,6 +21,7 @@ export default {
     extend: {
       fontFamily: {
         miralone: ["Miralone", "sans-serif"],
+        revans: ["Revans", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
