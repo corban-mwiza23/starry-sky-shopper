@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { NewsletterSubscriber } from "@/types/supabase";
 
 const NewsletterSignup = () => {
   const [email, setEmail] = useState("");
@@ -29,7 +31,7 @@ const NewsletterSignup = () => {
     try {
       const { error } = await supabase
         .from('newsletter_subscribers')
-        .insert([{ email }]);
+        .insert([{ email }] as NewsletterSubscriber[]);
 
       if (error) throw error;
 

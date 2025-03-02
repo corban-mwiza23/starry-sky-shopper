@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,16 +12,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { Order, Profile } from "@/types/supabase";
 
-interface Order {
-  id: number;
-  product_id: number;
-  quantity: number;
-  total_price: number;
-  status: string;
-  created_at: string;
+interface ExtendedOrder extends Order {
   products: {
     name: string;
   };
@@ -33,8 +27,9 @@ const Account = () => {
   const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<ExtendedOrder[]>([]);
   const [activeTab, setActiveTab] = useState("all");
+  const { toast } = useToast();
 
   useEffect(() => {
     const getProfile = async () => {
@@ -75,8 +70,10 @@ const Account = () => {
 
             return {
               ...order,
-              products: { name: productData?.name || 'Unknown Product' }
-            };
+              products: { 
+                name: productData?.name || 'Unknown Product' 
+              }
+            } as ExtendedOrder;
           })
         );
 
@@ -92,17 +89,17 @@ const Account = () => {
     };
 
     getProfile();
-  }, [navigate]);
+  }, [navigate, toast]);
 
   const updateProfile = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const updates = {
+      const updates: Partial<Profile> = {
         id: user.id,
         username,
-        updated_at: new Date(),
+        updated_at: new Date().toISOString(),
       };
 
       const { error } = await supabase

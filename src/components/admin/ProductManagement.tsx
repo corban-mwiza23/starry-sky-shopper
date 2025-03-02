@@ -5,15 +5,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Trash2, Percent } from "lucide-react";
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  discount_percentage: number;
-  is_on_sale: boolean;
-}
+import { Product } from "@/types/supabase";
 
 const ProductManagement = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -50,22 +42,22 @@ const ProductManagement = () => {
         variant: "destructive",
       });
     } else {
-      setProducts(data || []);
+      setProducts(data as Product[]);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    const newProduct: Omit<Product, 'id'> = {
+      name,
+      price: parseFloat(price),
+      image,
+    };
+
     const { data, error } = await supabase
       .from('products')
-      .insert([
-        {
-          name,
-          price: parseFloat(price),
-          image,
-        },
-      ]);
+      .insert([newProduct]);
 
     if (error) {
       console.error('Error adding product:', error);
@@ -107,12 +99,14 @@ const ProductManagement = () => {
   };
 
   const handleDiscountUpdate = async (id: number, discount: number, is_on_sale: boolean) => {
+    const updateData = {
+      discount_percentage: discount,
+      is_on_sale: is_on_sale
+    };
+
     const { error } = await supabase
       .from('products')
-      .update({
-        discount_percentage: discount,
-        is_on_sale: is_on_sale
-      })
+      .update(updateData)
       .eq('id', id);
 
     if (error) {

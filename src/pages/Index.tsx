@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { Order } from "@/types/supabase";
 
 interface CartItem {
   id: number;
@@ -56,15 +57,18 @@ const Index = () => {
       }
 
       for (const item of cartItems) {
+        const orderData: Omit<Order, 'id' | 'created_at'> = {
+          product_id: item.id,
+          quantity: item.quantity,
+          total_price: item.price * item.quantity,
+          customer_name: customerName,
+          user_id: user.id,
+          status: 'pending'
+        };
+
         const { error } = await supabase
           .from('orders')
-          .insert({
-            product_id: item.id,
-            quantity: item.quantity,
-            total_price: item.price * item.quantity,
-            customer_name: customerName,
-            user_id: user.id,
-          });
+          .insert(orderData);
 
         if (error) throw error;
       }

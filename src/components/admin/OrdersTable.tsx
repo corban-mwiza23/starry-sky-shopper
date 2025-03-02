@@ -23,28 +23,19 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { MapPin } from "lucide-react";
+import { Order } from "@/types/supabase";
 
-interface Order {
-  id: number;
-  product_id: number;
-  quantity: number;
-  total_price: number;
-  customer_name: string;
-  status: string;
-  created_at: string;
-  products: {
-    name: string;
-  };
-  shipping_addresses: {
+interface ExtendedOrder extends Order {
+  shipping_addresses?: {
     address: string;
     city: string;
     zip_code: string;
     email: string;
-  }[] | null; // Changed to array or null to match Supabase's return type
+  }[] | null;
 }
 
 const OrdersTable = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<ExtendedOrder[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -53,10 +44,10 @@ const OrdersTable = () => {
         .from('orders')
         .select(`
           *,
-          products!orders_product_id_fkey (
+          products (
             name
           ),
-          shipping_addresses!shipping_addresses_order_id_fkey (
+          shipping_addresses (
             address,
             city,
             zip_code,
@@ -73,7 +64,7 @@ const OrdersTable = () => {
           variant: "destructive",
         });
       } else {
-        setOrders(data as Order[]);
+        setOrders(data as ExtendedOrder[]);
       }
     };
 

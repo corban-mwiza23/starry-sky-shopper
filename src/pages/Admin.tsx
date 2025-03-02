@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,6 +7,7 @@ import SalesChart from "@/components/SalesChart";
 import StatsCard from "@/components/admin/StatsCard";
 import OrdersTable from "@/components/admin/OrdersTable";
 import ProductManagement from "@/components/admin/ProductManagement";
+import { Order } from "@/types/supabase";
 
 const Admin = () => {
   const [stats, setStats] = useState({
@@ -51,12 +53,15 @@ const Admin = () => {
         return;
       }
 
-      const currentRevenue = currentMonthData?.reduce((sum, order) => sum + Number(order.total_price), 0) || 0;
-      const lastRevenue = lastMonthData?.reduce((sum, order) => sum + Number(order.total_price), 0) || 0;
+      const typedCurrentData = currentMonthData as Pick<Order, 'total_price' | 'created_at'>[];
+      const typedLastData = lastMonthData as Pick<Order, 'total_price' | 'created_at'>[];
+
+      const currentRevenue = typedCurrentData?.reduce((sum, order) => sum + Number(order.total_price), 0) || 0;
+      const lastRevenue = typedLastData?.reduce((sum, order) => sum + Number(order.total_price), 0) || 0;
       const revenueGrowth = lastRevenue ? ((currentRevenue - lastRevenue) / lastRevenue) * 100 : 0;
 
-      const currentOrders = currentMonthData?.length || 0;
-      const lastOrders = lastMonthData?.length || 0;
+      const currentOrders = typedCurrentData?.length || 0;
+      const lastOrders = typedLastData?.length || 0;
       const ordersGrowth = lastOrders ? ((currentOrders - lastOrders) / lastOrders) * 100 : 0;
 
       // Assuming 30% profit margin for demonstration

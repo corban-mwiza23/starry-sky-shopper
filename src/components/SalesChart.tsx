@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -7,6 +8,7 @@ import {
 } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 import { format } from "date-fns";
+import { Order } from "@/types/supabase";
 
 interface SalesData {
   date: string;
@@ -36,8 +38,7 @@ const SalesChart = () => {
       try {
         const { data, error } = await supabase
           .from('orders')
-          .select('created_at, total_price')
-          .order('created_at');
+          .select('created_at, total_price');
 
         if (error) {
           console.error('Error fetching sales data:', error);
@@ -45,8 +46,8 @@ const SalesChart = () => {
         }
 
         // Group sales by date
-        const groupedSales = data.reduce((acc: Record<string, number>, order) => {
-          const date = format(new Date(order.created_at!), 'MMM d');
+        const groupedSales = (data as Order[]).reduce((acc: Record<string, number>, order) => {
+          const date = format(new Date(order.created_at), 'MMM d');
           acc[date] = (acc[date] || 0) + Number(order.total_price);
           return acc;
         }, {});

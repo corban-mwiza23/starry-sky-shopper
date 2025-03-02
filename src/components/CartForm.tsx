@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -6,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ShippingAddress } from "@/types/supabase";
 
 const checkoutSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -51,7 +53,7 @@ export const CartForm = ({ onBack, onComplete }: CartFormProps) => {
     if (!success) return;
 
     // Get the latest order for this user to link it to the shipping address
-    const { data: latestOrder } = await supabase
+    const { data: latestOrder, error: orderError } = await supabase
       .from('orders')
       .select('id')
       .eq('user_id', user.id)
@@ -59,23 +61,25 @@ export const CartForm = ({ onBack, onComplete }: CartFormProps) => {
       .limit(1)
       .single();
 
-    if (!latestOrder) {
-      console.error("Could not find the created order");
+    if (orderError || !latestOrder) {
+      console.error("Could not find the created order:", orderError);
       return;
     }
 
     // Save shipping address
+    const shippingData: Omit<ShippingAddress, 'id' | 'created_at'> = {
+      user_id: user.id,
+      order_id: latestOrder.id,
+      name: data.name,
+      email: data.email,
+      address: data.address,
+      city: data.city,
+      zip_code: data.zipCode,
+    };
+
     const { error: addressError } = await supabase
       .from('shipping_addresses')
-      .insert({
-        user_id: user.id,
-        order_id: latestOrder.id,
-        name: data.name,
-        email: data.email,
-        address: data.address,
-        city: data.city,
-        zip_code: data.zipCode,
-      });
+      .insert(shippingData);
 
     if (addressError) {
       console.error("Error saving shipping address:", addressError);
