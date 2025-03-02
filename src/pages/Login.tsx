@@ -17,7 +17,7 @@ const customStyles = {
     border: "1px solid rgba(255, 255, 255, 0.1)",
   },
   button: {
-    backgroundColor: "rgb(124, 58, 237)",
+    backgroundColor: "#222222",
     color: "white",
     fontFamily: "Miralone, monospace",
   },
@@ -88,7 +88,7 @@ const Login = () => {
             alt="Millicado Logo" 
             className="h-28 w-auto mx-auto mb-4"
           />
-          <h1 className="text-3xl font-bold font-revans mb-2 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">MILLICADO</h1>
+          <h1 className="text-3xl font-bold font-revans mb-2 text-white/90">MILLICADO</h1>
           <p className="text-gray-400 font-miralone">Sign in to continue</p>
         </div>
         
@@ -98,8 +98,8 @@ const Login = () => {
             theme: ThemeSupa,
             style: customStyles,
             className: {
-              button: "hover:bg-purple-400 transition-colors duration-200",
-              input: "focus:border-purple-500",
+              button: "hover:bg-[#333333] transition-colors duration-200",
+              input: "focus:border-gray-500",
             }
           }}
           providers={[]}

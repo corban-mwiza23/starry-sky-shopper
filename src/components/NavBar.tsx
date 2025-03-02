@@ -59,7 +59,7 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
           />
           <h1 
             onClick={() => navigate('/')} 
-            className="text-2xl font-bold font-revans bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent cursor-pointer hover:from-purple-500 hover:to-pink-700 transition-all"
+            className="text-2xl font-bold font-revans text-white/80 cursor-pointer hover:text-white transition-all"
           >
             Millicado
           </h1>
@@ -108,7 +108,7 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
           ) : (
             <Button
               onClick={() => navigate("/login")}
-              className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white border-none transition-all duration-200 font-miralone"
+              className="bg-[#222222] hover:bg-[#333333] text-white border-none transition-all duration-200 font-miralone"
             >
               Sign In
             </Button>
