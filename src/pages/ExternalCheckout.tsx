@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CartForm } from "@/components/CartForm";
@@ -9,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 const ExternalCheckout = () => {
   const [searchParams] = useSearchParams();
-  const productId = searchParams.get("productId");
+  const productIdParam = searchParams.get("productId");
   const { toast } = useToast();
   const navigate = useNavigate();
   const [productDetails, setProductDetails] = useState<{
@@ -22,7 +21,7 @@ const ExternalCheckout = () => {
 
   useEffect(() => {
     const fetchProductDetails = async () => {
-      if (!productId) {
+      if (!productIdParam) {
         toast({
           title: "Error",
           description: "No product ID specified",
@@ -33,6 +32,12 @@ const ExternalCheckout = () => {
       }
 
       try {
+        const productId = parseInt(productIdParam, 10);
+        
+        if (isNaN(productId)) {
+          throw new Error("Invalid product ID format");
+        }
+
         const { data, error } = await supabase
           .from("products")
           .select("id, name, price, image")
@@ -56,7 +61,7 @@ const ExternalCheckout = () => {
     };
 
     fetchProductDetails();
-  }, [productId, toast]);
+  }, [productIdParam, toast]);
 
   const handleOrderSubmit = async (customerName: string) => {
     if (!productDetails) return false;
@@ -93,7 +98,6 @@ const ExternalCheckout = () => {
         description: "Order placed successfully",
       });
 
-      // After 2 seconds, redirect to homepage
       setTimeout(() => navigate("/"), 2000);
       return true;
     } catch (error) {
