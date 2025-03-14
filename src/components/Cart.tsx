@@ -23,6 +23,7 @@ interface CartProps {
 
 const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -38,7 +39,7 @@ const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
   };
 
   return (
-    <Sheet>
+    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
         <Button 
           variant="outline" 
@@ -92,6 +93,7 @@ const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
                       if (success) {
                         setItems([]);
                         setIsCheckingOut(false);
+                        setIsSheetOpen(false);
                       }
                       return success;
                     }}

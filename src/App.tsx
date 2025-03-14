@@ -6,6 +6,7 @@ import Index from "@/pages/Index";
 import Admin from "@/pages/Admin";
 import Login from "@/pages/Login";
 import Account from "@/pages/Account";
+import ExternalCheckout from "@/pages/ExternalCheckout";
 import { Toaster } from "@/components/ui/toaster";
 
 function App() {
@@ -58,6 +59,10 @@ function App() {
         <Route 
           path="/account" 
           element={isAuthenticated ? <Account /> : <Navigate to="/login" />} 
+        />
+        <Route 
+          path="/checkout" 
+          element={<ExternalCheckout />} 
         />
       </Routes>
       <Toaster />
