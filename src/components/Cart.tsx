@@ -6,6 +6,7 @@ import { ShoppingCart } from "lucide-react";
 import { CartForm } from "./CartForm";
 import { CartItemList } from "./CartItemList";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 export interface CartItem {
   id: number;
@@ -24,6 +25,7 @@ interface CartProps {
 const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const navigate = useNavigate();
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -36,6 +38,17 @@ const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
 
   const handleRemoveItem = (id: number) => {
     setItems(items.filter(item => item.id !== id));
+  };
+
+  const handleProceedToCheckout = () => {
+    // If there's only one item in the cart, redirect to the external checkout
+    if (items.length === 1) {
+      setIsSheetOpen(false);
+      navigate(`/checkout?productId=${items[0].id}`);
+    } else {
+      // For multiple items, show the inline checkout form
+      setIsCheckingOut(true);
+    }
   };
 
   return (
@@ -77,7 +90,7 @@ const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
                 </p>
                 {!isCheckingOut ? (
                   <Button 
-                    onClick={() => setIsCheckingOut(true)}
+                    onClick={handleProceedToCheckout}
                     className="w-full mt-4 bg-white text-cosmic-dark hover:bg-cosmic-light sm:py-6 text-base sm:text-lg"
                   >
                     Proceed to Checkout
