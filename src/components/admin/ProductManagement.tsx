@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Trash2, Percent } from "lucide-react";
-import { Product } from "@/types/supabase";
+import { Product } from "@/types/database";
 
 const ProductManagement = () => {
   const [products, setProducts] = useState<Product[]>([]);

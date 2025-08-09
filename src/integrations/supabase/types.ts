@@ -14,7 +14,160 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      newsletter_subscribers: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: number
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: number
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: number
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          created_at: string | null
+          customer_name: string
+          id: number
+          product_id: number | null
+          quantity: number
+          status: string | null
+          total_price: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_name: string
+          id?: number
+          product_id?: number | null
+          quantity?: number
+          status?: string | null
+          total_price: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_name?: string
+          id?: number
+          product_id?: number | null
+          quantity?: number
+          status?: string | null
+          total_price?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          created_at: string | null
+          discount_percentage: number | null
+          id: number
+          image: string
+          is_on_sale: boolean | null
+          name: string
+          price: number
+        }
+        Insert: {
+          created_at?: string | null
+          discount_percentage?: number | null
+          id?: number
+          image: string
+          is_on_sale?: boolean | null
+          name: string
+          price: number
+        }
+        Update: {
+          created_at?: string | null
+          discount_percentage?: number | null
+          id?: number
+          image?: string
+          is_on_sale?: boolean | null
+          name?: string
+          price?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      shipping_addresses: {
+        Row: {
+          address: string
+          city: string
+          created_at: string | null
+          email: string
+          id: number
+          name: string
+          order_id: number | null
+          user_id: string | null
+          zip_code: string
+        }
+        Insert: {
+          address: string
+          city: string
+          created_at?: string | null
+          email: string
+          id?: number
+          name: string
+          order_id?: number | null
+          user_id?: string | null
+          zip_code: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          created_at?: string | null
+          email?: string
+          id?: number
+          name?: string
+          order_id?: number | null
+          user_id?: string | null
+          zip_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipping_addresses_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

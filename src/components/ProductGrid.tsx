@@ -1,15 +1,7 @@
 import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import { supabase } from "@/integrations/supabase/client";
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  discount_percentage?: number | null;
-  is_on_sale?: boolean | null;
-}
+import { Product } from "@/types/database";
 
 interface ProductGridProps {
   onAddToCart: (id: number, name: string, price: number, image: string) => void;

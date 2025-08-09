@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { Order } from "@/types/supabase";
+import { Order } from "@/types/database";
 
 interface ExtendedOrder extends Order {
   products: {
@@ -48,10 +48,10 @@ const OrdersTable = () => {
     try {
       setLoading(true);
       // First fetch all orders
-      const { data: orderData, error: orderError } = await supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
+        const { data: orderData, error: orderError } = await supabase
+          .from('orders')
+          .select('*')
+          .order('created_at', { ascending: false });
 
       if (orderError) throw orderError;
       if (!orderData) return;
@@ -148,21 +148,21 @@ const OrdersTable = () => {
                   <TableCell>{order.products.name}</TableCell>
                   <TableCell>{order.quantity}</TableCell>
                   <TableCell>${order.total_price}</TableCell>
+                   <TableCell>
+                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                       order.status === 'completed' ? 'bg-green-100 text-green-800' :
+                       order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                       'bg-red-100 text-red-800'
+                     }`}>
+                       {order.status || 'pending'}
+                     </span>
+                   </TableCell>
+                  <TableCell>{order.created_at ? new Date(order.created_at).toLocaleDateString() : 'N/A'}</TableCell>
                   <TableCell>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      order.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {order.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <Select
-                      defaultValue={order.status}
-                      onValueChange={(value) => updateOrderStatus(order.id, value)}
-                    >
+                     <Select
+                       defaultValue={order.status || 'pending'}
+                       onValueChange={(value) => updateOrderStatus(order.id, value)}
+                     >
                       <SelectTrigger className="w-[120px]">
                         <SelectValue placeholder="Change status" />
                       </SelectTrigger>

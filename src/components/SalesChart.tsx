@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 import { format } from "date-fns";
-import { Order } from "@/types/supabase";
+import { Order } from "@/types/database";
 
 interface SalesData {
   date: string;
@@ -47,8 +47,10 @@ const SalesChart = () => {
 
         // Group sales by date
         const groupedSales = (data as Order[]).reduce((acc: Record<string, number>, order) => {
-          const date = format(new Date(order.created_at), 'MMM d');
-          acc[date] = (acc[date] || 0) + Number(order.total_price);
+          if (order.created_at) {
+            const date = format(new Date(order.created_at), 'MMM d');
+            acc[date] = (acc[date] || 0) + Number(order.total_price);
+          }
           return acc;
         }, {});
 

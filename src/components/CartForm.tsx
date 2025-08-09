@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ShippingAddress } from "@/types/supabase";
+import { ShippingAddress } from "@/types/database";
 
 const checkoutSchema = z.object({
   name: z.string().min(1, "Name is required"),
