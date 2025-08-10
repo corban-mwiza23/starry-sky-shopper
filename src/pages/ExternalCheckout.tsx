@@ -117,7 +117,7 @@ const ExternalCheckout = () => {
       <div className="relative w-full max-w-md z-10">
         <div className="text-center mb-8">
           <img 
-            src="/lovable-uploads/millicado-spider-logo.png" 
+            src="/lovable-uploads/761c3dec-7031-4392-b6d8-70525efd46e2.png" 
             alt="Millicado Logo" 
             className="h-16 w-auto mx-auto mb-2"
           />

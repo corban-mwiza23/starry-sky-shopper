@@ -80,8 +80,10 @@ export type Database = {
           id: number
           image: string
           is_on_sale: boolean | null
+          is_sold_out: boolean | null
           name: string
           price: number
+          quantity: number | null
         }
         Insert: {
           created_at?: string | null
@@ -89,8 +91,10 @@ export type Database = {
           id?: number
           image: string
           is_on_sale?: boolean | null
+          is_sold_out?: boolean | null
           name: string
           price: number
+          quantity?: number | null
         }
         Update: {
           created_at?: string | null
@@ -98,8 +102,10 @@ export type Database = {
           id?: number
           image?: string
           is_on_sale?: boolean | null
+          is_sold_out?: boolean | null
           name?: string
           price?: number
+          quantity?: number | null
         }
         Relationships: []
       }

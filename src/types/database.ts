@@ -5,6 +5,8 @@ export interface Product {
   image: string;
   discount_percentage?: number | null;
   is_on_sale?: boolean | null;
+  quantity?: number | null;
+  is_sold_out?: boolean | null;
   created_at?: string | null;
 }
 

@@ -23,7 +23,7 @@ const Login = () => {
       <div className="w-full max-w-md space-y-8 p-8">
         <div className="text-center">
           <img 
-            src="/lovable-uploads/millicado-spider-logo.png" 
+            src="/lovable-uploads/761c3dec-7031-4392-b6d8-70525efd46e2.png" 
             alt="Millicado Logo" 
             className="h-20 w-auto mx-auto mb-6"
           />

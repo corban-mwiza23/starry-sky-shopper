@@ -53,7 +53,7 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <img 
-            src="/lovable-uploads/millicado-spider-logo.png" 
+            src="/lovable-uploads/761c3dec-7031-4392-b6d8-70525efd46e2.png" 
             alt="Millicado Logo" 
             className="h-9 w-auto"
           />

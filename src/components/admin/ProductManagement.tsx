@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Trash2, Percent } from "lucide-react";
+import { Trash2, Percent, Package } from "lucide-react";
 import { Product } from "@/types/database";
 
 const ProductManagement = () => {
@@ -12,6 +12,7 @@ const ProductManagement = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
+  const [quantity, setQuantity] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -53,6 +54,8 @@ const ProductManagement = () => {
       name,
       price: parseFloat(price),
       image,
+      quantity: quantity ? parseInt(quantity) : 0,
+      is_sold_out: false,
     };
 
     const { data, error } = await supabase
@@ -74,6 +77,7 @@ const ProductManagement = () => {
       setName("");
       setPrice("");
       setImage("");
+      setQuantity("");
     }
   };
 
@@ -124,6 +128,29 @@ const ProductManagement = () => {
     }
   };
 
+  const handleQuantityUpdate = async (id: number, quantity: number) => {
+    const is_sold_out = quantity === 0;
+
+    const { error } = await supabase
+      .from('products')
+      .update({ quantity, is_sold_out })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error updating quantity:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update quantity",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Quantity updated successfully",
+      });
+    }
+  };
+
   return (
     <Card className="p-6 shadow-sm">
       <div className="space-y-6">
@@ -159,6 +186,17 @@ const ProductManagement = () => {
                 required
               />
             </div>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-2">Quantity</label>
+              <Input
+                type="number"
+                min="0"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                className="bg-background"
+                placeholder="0"
+              />
+            </div>
             <Button type="submit" className="w-full">
               Add Product
             </Button>
@@ -173,7 +211,10 @@ const ProductManagement = () => {
                 <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded-lg" />
                 <h3 className="font-semibold">{product.name}</h3>
                 <p className="text-sm text-gray-600">${product.price}</p>
+                
+                {/* Discount Management */}
                 <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">Discount:</span>
                   <Input
                     type="number"
                     min="0"
@@ -184,14 +225,42 @@ const ProductManagement = () => {
                       parseInt(e.target.value),
                       parseInt(e.target.value) > 0
                     )}
-                    className="w-20"
+                    className="w-16 h-8 text-xs"
                   />
-                  <Percent className="w-4 h-4 text-gray-500" />
+                  <Percent className="w-3 h-3 text-gray-500" />
+                </div>
+
+                {/* Quantity Management */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">Quantity:</span>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={product.quantity || 0}
+                    onChange={(e) => handleQuantityUpdate(
+                      product.id,
+                      parseInt(e.target.value) || 0
+                    )}
+                    className="w-16 h-8 text-xs"
+                  />
+                  <Package className="w-3 h-3 text-gray-500" />
+                </div>
+
+                {/* Sold Out Status */}
+                <div className="flex items-center justify-between">
+                  <span className={`text-xs px-2 py-1 rounded ${
+                    product.is_sold_out 
+                      ? 'bg-red-100 text-red-800' 
+                      : 'bg-green-100 text-green-800'
+                  }`}>
+                    {product.is_sold_out ? 'Sold Out' : 'In Stock'}
+                  </span>
+                  
                   <Button
                     variant="destructive"
                     size="icon"
                     onClick={() => handleDelete(product.id)}
-                    className="ml-auto"
+                    className="h-8 w-8"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
