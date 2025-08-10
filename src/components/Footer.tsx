@@ -4,15 +4,7 @@ import NewsletterSignup from "./NewsletterSignup";
 const Footer = () => {
   return (
     <footer className="mt-20 bg-[#121212] text-white">
-      <div className="container mx-auto px-4 py-12">
-        <div className="flex justify-center mb-8">
-          <img 
-            src="/lovable-uploads/761c3dec-7031-4392-b6d8-70525efd46e2.png" 
-            alt="Millicado Logo" 
-            className="h-16 w-auto"
-          />
-        </div>
-        
+      <div className="container mx-auto px-4 py-12">        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {/* Company Address */}
           <div className="space-y-4">

@@ -29,15 +29,26 @@ const NewsletterSignup = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase
+      // Save to database
+      const { error: dbError } = await supabase
         .from('newsletter_subscribers')
         .insert([{ email }] as NewsletterSubscriber[]);
 
-      if (error) throw error;
+      if (dbError) throw dbError;
+
+      // Send welcome email
+      const { error: emailError } = await supabase.functions.invoke('send-welcome-email', {
+        body: { email }
+      });
+
+      if (emailError) {
+        console.error('Email sending failed:', emailError);
+        // Don't throw here - subscription was successful even if email failed
+      }
 
       toast({
-        title: "Success!",
-        description: "You've been subscribed to our newsletter.",
+        title: "Welcome to Millicado! 🎉",
+        description: "You've been subscribed and will receive a welcome email shortly.",
       });
       setEmail("");
       setConsent(false);
