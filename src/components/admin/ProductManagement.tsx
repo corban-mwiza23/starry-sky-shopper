@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Trash2, Percent, Package } from "lucide-react";
+import { Trash2, Percent, Package, Upload, Link } from "lucide-react";
 import { Product } from "@/types/database";
 
 const ProductManagement = () => {
@@ -13,6 +13,9 @@ const ProductManagement = () => {
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
   const [quantity, setQuantity] = useState("");
+  const [imageMethod, setImageMethod] = useState<"url" | "upload">("url");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -47,13 +50,32 @@ const ProductManagement = () => {
     }
   };
 
+  const handleImageUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      setImage(result);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    let finalImageUrl = image;
+    
+    // If using file upload method and a file is selected
+    if (imageMethod === "upload" && imageFile) {
+      handleImageUpload(imageFile);
+      // Wait a moment for the file to be processed
+      await new Promise(resolve => setTimeout(resolve, 100));
+      finalImageUrl = image;
+    }
     
     const newProduct: Omit<Product, 'id'> = {
       name,
       price: parseFloat(price),
-      image,
+      image: finalImageUrl,
       quantity: quantity ? parseInt(quantity) : 0,
       is_sold_out: false,
     };
@@ -78,6 +100,10 @@ const ProductManagement = () => {
       setPrice("");
       setImage("");
       setQuantity("");
+      setImageFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -178,13 +204,81 @@ const ProductManagement = () => {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground block mb-2">Image URL</label>
-              <Input
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                className="bg-background"
-                required
-              />
+              <label className="text-sm font-medium text-foreground block mb-2">Product Image</label>
+              
+              {/* Image Method Toggle */}
+              <div className="flex gap-2 mb-3">
+                <Button
+                  type="button"
+                  variant={imageMethod === "url" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setImageMethod("url")}
+                  className="flex items-center gap-2"
+                >
+                  <Link className="w-4 h-4" />
+                  URL
+                </Button>
+                <Button
+                  type="button"
+                  variant={imageMethod === "upload" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setImageMethod("upload")}
+                  className="flex items-center gap-2"
+                >
+                  <Upload className="w-4 h-4" />
+                  Upload
+                </Button>
+              </div>
+
+              {/* Image URL Input */}
+              {imageMethod === "url" && (
+                <Input
+                  placeholder="Enter image URL"
+                  value={image}
+                  onChange={(e) => setImage(e.target.value)}
+                  className="bg-background"
+                  required
+                />
+              )}
+
+              {/* File Upload Input */}
+              {imageMethod === "upload" && (
+                <div className="space-y-2">
+                  <Input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setImageFile(file);
+                        handleImageUpload(file);
+                      }
+                    }}
+                    className="bg-background"
+                    required
+                  />
+                  {imageFile && (
+                    <p className="text-xs text-muted-foreground">
+                      Selected: {imageFile.name}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Image Preview */}
+              {image && (
+                <div className="mt-2">
+                  <img 
+                    src={image} 
+                    alt="Preview" 
+                    className="w-20 h-20 object-cover rounded border"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
             </div>
             <div>
               <label className="text-sm font-medium text-foreground block mb-2">Quantity</label>
