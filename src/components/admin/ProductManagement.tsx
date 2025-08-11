@@ -107,6 +107,27 @@ const ProductManagement = () => {
     }
   };
 
+  const handleSoldOutToggle = async (id: number, is_sold_out: boolean) => {
+    const { error } = await supabase
+      .from('products')
+      .update({ is_sold_out })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error updating sold out status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update product status",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: `Product marked as ${is_sold_out ? 'sold out' : 'available'}`,
+      });
+    }
+  };
+
   const handleDelete = async (id: number) => {
     const { error } = await supabase
       .from('products')
@@ -153,6 +174,7 @@ const ProductManagement = () => {
       });
     }
   };
+
 
   const handleQuantityUpdate = async (id: number, quantity: number) => {
     const is_sold_out = quantity === 0;
@@ -340,15 +362,25 @@ const ProductManagement = () => {
                   <Package className="w-3 h-3 text-gray-500" />
                 </div>
 
-                {/* Sold Out Status */}
+                {/* Sold Out Status and Toggle */}
                 <div className="flex items-center justify-between">
-                  <span className={`text-xs px-2 py-1 rounded ${
-                    product.is_sold_out 
-                      ? 'bg-red-100 text-red-800' 
-                      : 'bg-green-100 text-green-800'
-                  }`}>
-                    {product.is_sold_out ? 'Sold Out' : 'In Stock'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs px-2 py-1 rounded ${
+                      product.is_sold_out 
+                        ? 'bg-red-100 text-red-800' 
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {product.is_sold_out ? 'Sold Out' : 'In Stock'}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleSoldOutToggle(product.id, !product.is_sold_out)}
+                      className="h-6 text-xs px-2"
+                    >
+                      {product.is_sold_out ? 'Mark Available' : 'Mark Sold Out'}
+                    </Button>
+                  </div>
                   
                   <Button
                     variant="destructive"

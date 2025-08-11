@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "@/pages/Index";
 import Admin from "@/pages/Admin";
+import AdminAuth from "@/pages/AdminAuth";
 import Login from "@/pages/Login";
 import Account from "@/pages/Account";
 import ExternalCheckout from "@/pages/ExternalCheckout";
@@ -53,8 +54,12 @@ function App() {
           element={isAuthenticated ? <Index /> : <Navigate to="/login" />} 
         />
         <Route 
+          path="/admin-auth" 
+          element={<AdminAuth />} 
+        />
+        <Route 
           path="/admin" 
-          element={isAuthenticated ? <Admin /> : <Navigate to="/login" />} 
+          element={<Admin />} 
         />
         <Route 
           path="/account" 

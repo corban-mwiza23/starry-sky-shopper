@@ -3,13 +3,21 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import SalesChart from "@/components/SalesChart";
 import StatsCard from "@/components/admin/StatsCard";
 import OrdersTable from "@/components/admin/OrdersTable";
 import ProductManagement from "@/components/admin/ProductManagement";
 import { Order } from "@/types/supabase";
+import { User } from "@supabase/supabase-js";
+import { useNavigate } from "react-router-dom";
+import { LogOut } from "lucide-react";
+
+const ADMIN_EMAIL = "corbanmwiza@gmail.com";
 
 const Admin = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalRevenue: 0,
     totalOrders: 0,
@@ -19,8 +27,42 @@ const Admin = () => {
     profitGrowth: 0
   });
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // Check authentication status
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session || session.user.email !== ADMIN_EMAIL) {
+        navigate("/admin-auth");
+        return;
+      }
+      
+      setUser(session.user);
+      setLoading(false);
+    };
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (!session || session.user.email !== ADMIN_EMAIL) {
+          navigate("/admin-auth");
+          return;
+        }
+        setUser(session.user);
+        setLoading(false);
+      }
+    );
+
+    checkAuth();
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!user) return;
+
     const fetchStats = async () => {
       // Fetch current month's data
       const currentDate = new Date();
@@ -90,17 +132,44 @@ const Admin = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [user]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/admin-auth");
+  };
+
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-2 text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-[1400px] mx-auto p-8">
-        <div className="flex items-center justify-center mb-8">
-          <img 
-            src="/lovable-uploads/761c3dec-7031-4392-b6d8-70525efd46e2.png" 
-            alt="Millicado Logo" 
-            className="h-20 w-auto"
-          />
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <img 
+              src="/lovable-uploads/761c3dec-7031-4392-b6d8-70525efd46e2.png" 
+              alt="Millicado Logo" 
+              className="h-20 w-auto"
+            />
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleLogout}
+            className="flex items-center gap-2"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </Button>
         </div>
         
         <h1 className="text-3xl font-bold text-foreground mb-8 text-center">Sales Dashboard</h1>

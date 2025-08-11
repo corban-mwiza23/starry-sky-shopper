@@ -21,12 +21,16 @@ interface NavBarProps {
 const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  const ADMIN_EMAIL = "corbanmwiza@gmail.com";
 
   useEffect(() => {
     const getProfile = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
+          setUserEmail(user.email);
           const { data: profile } = await supabase
             .from('profiles')
             .select('username')
@@ -86,6 +90,16 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
+                    {userEmail === ADMIN_EMAIL && (
+                      <Button 
+                        variant="outline" 
+                        className="w-full justify-start gap-2 font-miralone"
+                        onClick={() => navigate('/admin-auth')}
+                      >
+                        <UserCircle className="h-4 w-4" />
+                        Admin Panel
+                      </Button>
+                    )}
                     <Button 
                       variant="outline" 
                       className="w-full justify-start gap-2 font-miralone"
