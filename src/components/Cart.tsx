@@ -27,7 +27,8 @@ const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const navigate = useNavigate();
 
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // Calculate total
+  const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   const handleUpdateQuantity = (id: number, newQuantity: number) => {
     if (newQuantity < 1) return;
@@ -98,6 +99,7 @@ const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
                 ) : (
                   <CartForm 
                     onBack={() => setIsCheckingOut(false)}
+                    totalAmount={total}
                     onComplete={async (customerName) => {
                       const { data: { user } } = await supabase.auth.getUser();
                       if (!user) return false;
