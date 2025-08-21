@@ -24,7 +24,7 @@ const ProductGrid = ({ onAddToCart }: ProductGridProps) => {
           return;
         }
 
-        setProducts(data || []);
+        setProducts(data as Product[] || []);
       } catch (error) {
         console.error('Error:', error);
       } finally {

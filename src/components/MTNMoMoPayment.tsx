@@ -119,7 +119,14 @@ export const MTNMoMoPayment: React.FC<MTNMoMoPaymentProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+          <p className="text-sm font-medium text-yellow-800 mb-1">🚧 Under Development</p>
+          <p className="text-xs text-yellow-700">
+            MTN MoMo payments are currently being tested. Please use cash payment for now.
+          </p>
+        </div>
+        
+        <div className="space-y-2 opacity-50">
           <Label htmlFor="phone">Phone Number</Label>
           <Input
             id="phone"
@@ -127,14 +134,14 @@ export const MTNMoMoPayment: React.FC<MTNMoMoPaymentProps> = ({
             placeholder="0781234567"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
-            disabled={isProcessing}
+            disabled={true}
           />
           <p className="text-sm text-muted-foreground">
             Enter your MTN Mobile Money number
           </p>
         </div>
         
-        <div className="p-3 bg-muted rounded-lg">
+        <div className="p-3 bg-muted rounded-lg opacity-50">
           <div className="flex justify-between items-center">
             <span className="font-medium">Amount to pay:</span>
             <span className="font-bold">{amount.toLocaleString()} RWF</span>
@@ -143,14 +150,14 @@ export const MTNMoMoPayment: React.FC<MTNMoMoPaymentProps> = ({
 
         <Button 
           onClick={handlePayment}
-          disabled={isProcessing || !phoneNumber}
-          className="w-full"
+          disabled={true}
+          className="w-full opacity-50"
         >
-          {isProcessing ? 'Processing...' : 'Pay with MTN MoMo'}
+          Under Development - Use Cash Payment
         </Button>
 
         <p className="text-xs text-muted-foreground text-center">
-          You will receive a payment prompt on your phone. Follow the instructions to complete the payment.
+          This payment method is currently under development and testing.
         </p>
       </CardContent>
     </Card>

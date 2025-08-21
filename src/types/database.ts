@@ -8,6 +8,7 @@ export interface Product {
   quantity?: number | null;
   is_sold_out?: boolean | null;
   created_at?: string | null;
+  category?: 'hoodie' | 'tee' | 'jacket' | 'pant' | 'skate' | null;
 }
 
 export interface Order {

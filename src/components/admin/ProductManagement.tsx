@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Trash2, Percent, Package, Upload, Link } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Product } from "@/types/database";
 
 const ProductManagement = () => {
@@ -13,10 +14,19 @@ const ProductManagement = () => {
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
   const [quantity, setQuantity] = useState("");
+  const [category, setCategory] = useState<'hoodie' | 'tee' | 'jacket' | 'pant' | 'skate' | ''>("");
   const [imageMethod, setImageMethod] = useState<"url" | "upload">("url");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Helper function to determine if a product is new (created within last 7 days)
+  const isNewProduct = (createdAt: string) => {
+    const created = new Date(createdAt);
+    const now = new Date();
+    const daysDiff = Math.floor((now.getTime() - created.getTime()) / (1000 * 3600 * 24));
+    return daysDiff <= 7;
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -78,6 +88,7 @@ const ProductManagement = () => {
       image: finalImageUrl,
       quantity: quantity ? parseInt(quantity) : 0,
       is_sold_out: false,
+      category: category || null,
     };
 
     const { data, error } = await supabase
@@ -100,6 +111,7 @@ const ProductManagement = () => {
       setPrice("");
       setImage("");
       setQuantity("");
+      setCategory("");
       setImageFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -303,6 +315,21 @@ const ProductManagement = () => {
               )}
             </div>
             <div>
+              <label className="text-sm font-medium text-foreground block mb-2">Category</label>
+              <Select value={category} onValueChange={(value) => setCategory(value as 'hoodie' | 'tee' | 'jacket' | 'pant' | 'skate' | '')}>
+                <SelectTrigger className="bg-background">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="hoodie">Hoodie</SelectItem>
+                  <SelectItem value="tee">Tee</SelectItem>
+                  <SelectItem value="jacket">Jacket</SelectItem>
+                  <SelectItem value="pant">Pant</SelectItem>
+                  <SelectItem value="skate">Skate</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
               <label className="text-sm font-medium text-foreground block mb-2">Quantity</label>
               <Input
                 type="number"
@@ -325,8 +352,22 @@ const ProductManagement = () => {
             {products.map((product) => (
               <div key={product.id} className="border rounded-lg p-4 space-y-3">
                 <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded-lg" />
-                <h3 className="font-semibold">{product.name}</h3>
-                <p className="text-sm text-gray-600">${product.price}</p>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">{product.name}</h3>
+                  {product.created_at && isNewProduct(product.created_at) && (
+                    <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800 font-medium">
+                      NEW
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-600">${product.price}</p>
+                  {product.category && (
+                    <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700 capitalize">
+                      {product.category}
+                    </span>
+                  )}
+                </div>
                 
                 {/* Discount Management */}
                 <div className="flex items-center gap-2">

@@ -54,14 +54,6 @@ const Footer = () => {
         
         <div className="border-t border-white/10 pt-8">
           <div className="flex flex-col items-center justify-center space-y-4">
-            <div className="flex items-center justify-center">
-              <img 
-                src="/lovable-uploads/0116fb29-5a66-4eaf-8090-11a0bed3adba.png" 
-                alt="PayPal" 
-                className="h-8 w-auto"
-              />
-            </div>
-            
             <div className="text-center space-y-2 font-miralone text-sm text-white/80">
               <p>Copyright © 2024, <span className="font-revans text-white/90">MILLICADO</span></p>
               <p>Theme By Millicado Designs</p>

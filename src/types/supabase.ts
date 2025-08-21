@@ -7,6 +7,7 @@ export interface Product {
   created_at?: string;
   discount_percentage?: number;
   is_on_sale?: boolean;
+  category?: 'hoodie' | 'tee' | 'jacket' | 'pant' | 'skate';
 }
 
 export interface Order {
