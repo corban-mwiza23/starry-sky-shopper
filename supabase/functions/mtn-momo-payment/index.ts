@@ -33,11 +33,14 @@ serve(async (req) => {
     // MTN MoMo API endpoints (sandbox)
     const baseUrl = 'https://sandbox.momodeveloper.mtn.com';
     
-    // Step 1: Generate access token
+    // Step 1: Create API User if needed (for sandbox, we'll use a fixed UUID)
+    const apiUserId = mtnApiUserId || '1a27a019-5d38-4eac-a8ae-5b7fd8b6a405';
+    
+    // Step 2: Generate access token
     const tokenResponse = await fetch(`${baseUrl}/collection/token/`, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${btoa(`${mtnApiUserId}:${mtnApiKey}`)}`,
+        'Authorization': `Basic ${btoa(`${apiUserId}:${mtnApiKey}`)}`,
         'Ocp-Apim-Subscription-Key': mtnSubscriptionKey,
         'Content-Type': 'application/json',
       }
