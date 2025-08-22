@@ -156,8 +156,8 @@ const Admin = () => {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <img 
-              src="/lovable-uploads/761c3dec-7031-4392-b6d8-70525efd46e2.png" 
-              alt="Millicado Logo" 
+              src="/lovable-uploads/81b3af56-15f1-4535-8e61-b2a94a4afd4e.png" 
+              alt="PLUGG'IN Logo" 
               className="h-20 w-auto"
             />
           </div>
