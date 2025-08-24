@@ -112,16 +112,9 @@ const Index = () => {
       />
 
       <div className="flex flex-col md:flex-row relative z-10">
-        {/* Side Navigation */}
-        <div className="md:fixed md:left-0 md:top-0 md:pt-24 md:w-48 md:h-full bg-[#121212]/80 backdrop-blur-sm border-b md:border-b-0 md:border-r border-white/10">
-          <div className="flex justify-center mb-6 pt-4 md:pt-0">
-            <img 
-              src="/lovable-uploads/81b3af56-15f1-4535-8e61-b2a94a4afd4e.png" 
-              alt="PLUGG'IN Logo" 
-              className="h-20 w-auto"
-            />
-          </div>
-          <div className="flex md:flex-col overflow-x-auto md:overflow-x-visible whitespace-nowrap md:whitespace-normal p-4 space-x-4 md:space-x-0 md:space-y-4 text-white/80 font-miralone">
+                 {/* Side Navigation */}
+         <div className="md:fixed md:left-0 md:top-0 md:pt-24 md:w-48 md:h-full bg-[#121212]/80 backdrop-blur-sm border-b md:border-b-0 md:border-r border-white/10">
+           <div className="flex md:flex-col overflow-x-auto md:overflow-x-visible whitespace-nowrap md:whitespace-normal p-4 space-x-4 md:space-x-0 md:space-y-4 text-white/80 font-miralone">
             <Link to="/" className="hover:text-white transition-colors md:text-left px-4 md:px-0">New</Link>
             <Link to="/" className="hover:text-white transition-colors md:text-left px-4 md:px-0">Hoodies</Link>
             <Link to="/" className="hover:text-white transition-colors md:text-left px-4 md:px-0">Tees</Link>
