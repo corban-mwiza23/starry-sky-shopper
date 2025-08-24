@@ -23,13 +23,13 @@ const handler = async (req: Request): Promise<Response> => {
     const { email }: WelcomeEmailRequest = await req.json();
 
     const emailResponse = await resend.emails.send({
-      from: "Millicado <onboarding@resend.dev>",
+      from: "PLUGG'IN <onboarding@resend.dev>",
       to: [email],
-      subject: "Welcome to Millicado Newsletter! 🎉",
+      subject: "Welcome to PLUGG'IN Newsletter! 🎉",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
           <div style="background-color: #121212; padding: 40px; border-radius: 10px; text-align: center;">
-            <h1 style="color: #ffffff; font-size: 28px; margin-bottom: 20px; font-weight: bold;">Welcome to Millicado!</h1>
+            <h1 style="color: #ffffff; font-size: 28px; margin-bottom: 20px; font-weight: bold;">Welcome to PLUGG'IN!</h1>
             <p style="color: #ffffff; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
               Thank you for subscribing to our newsletter. You'll be the first to know about:
             </p>
@@ -41,7 +41,7 @@ const handler = async (req: Request): Promise<Response> => {
             </ul>
             <div style="margin-top: 30px; padding: 20px; background-color: rgba(255, 255, 255, 0.1); border-radius: 5px;">
               <p style="color: #ffffff; font-size: 14px; margin: 0;">
-                Stay tuned for exciting updates from the Millicado team!
+                Stay tuned for exciting updates from the PLUGG'IN team!
               </p>
             </div>
           </div>

@@ -23,7 +23,7 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
   const [username, setUsername] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  const ADMIN_EMAIL = "corbanmwiza@gmail.com";
+  const ADMIN_EMAILS = ["corbanmwiza@gmail.com", "jeanlucniyonsaba46@gmail.com"];
 
   useEffect(() => {
     const getProfile = async () => {
@@ -53,24 +53,31 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#121212]/90 backdrop-blur-sm border-b border-white/10">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <img 
-            src="/lovable-uploads/761c3dec-7031-4392-b6d8-70525efd46e2.png" 
-            alt="Millicado Logo" 
-            className="h-9 w-auto"
-          />
-          <h1 
-            onClick={() => navigate('/')} 
-            className="text-2xl font-bold font-revans text-white/80 cursor-pointer hover:text-white transition-all"
-          >
-            Millicado
-          </h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <Cart items={cartItems} setItems={setCartItems} onOrderSubmit={onOrderSubmit} />
-          {username ? (
+         <nav className="fixed top-0 left-0 right-0 z-50 bg-[#121212]/90 backdrop-blur-sm border-b border-white/10">
+       <div className="container mx-auto px-4 py-4 flex items-center relative">
+         {/* Left side - Logo */}
+         <div className="flex items-center gap-4">
+           <img 
+             src="/lovable-uploads/81b3af56-15f1-4535-8e61-b2a94a4afd4e.png" 
+             alt="PLUGG'IN Logo" 
+             className="h-12 w-auto"
+           />
+         </div>
+         
+         {/* Center - Brand Name */}
+         <div className="absolute left-1/2 transform -translate-x-1/2">
+           <h1 
+             onClick={() => navigate('/')} 
+             className="text-3xl font-bold font-revans text-white/80 cursor-pointer hover:text-white transition-all"
+           >
+             PLUGG'IN
+           </h1>
+         </div>
+         
+         {/* Right side - Cart and User */}
+         <div className="flex items-center gap-4 ml-auto">
+           <Cart items={cartItems} setItems={setCartItems} onOrderSubmit={onOrderSubmit} />
+           {username ? (
             <HoverCard>
               <HoverCardTrigger>
                 <Avatar className="cursor-pointer">
@@ -78,46 +85,45 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
                   <AvatarFallback>{username?.charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
               </HoverCardTrigger>
-              <HoverCardContent className="w-64 bg-[#121212] border border-white/10">
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${username}`} />
-                      <AvatarFallback>{username?.charAt(0).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium font-miralone">{username}</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    {userEmail === ADMIN_EMAIL && (
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start gap-2 font-miralone"
-                        onClick={() => navigate('/admin-auth')}
-                      >
-                        <UserCircle className="h-4 w-4" />
-                        Admin Panel
-                      </Button>
-                    )}
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start gap-2 font-miralone"
-                      onClick={() => navigate('/account')}
-                    >
-                      <UserCircle className="h-4 w-4" />
-                      Manage Account
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={handleSignOut}
-                      className="w-full text-white border-white/20 hover:bg-white/10 transition-colors duration-200 font-miralone"
-                    >
-                      Sign Out
-                    </Button>
-                  </div>
-                </div>
-              </HoverCardContent>
+                             <HoverCardContent className="w-72 bg-[#1a1a1a] border border-white/20 shadow-2xl rounded-xl p-6 backdrop-blur-md">
+                 <div className="flex flex-col gap-6">
+                   {/* User Profile Section */}
+                   <div className="flex items-center gap-4 pb-4 border-b border-white/10">
+                     <Avatar className="h-12 w-12 ring-2 ring-white/20">
+                       <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${username}`} />
+                       <AvatarFallback className="bg-gradient-to-br from-purple-500 to-blue-600 text-white font-semibold">
+                         {username?.charAt(0).toUpperCase()}
+                       </AvatarFallback>
+                     </Avatar>
+                     <div className="flex flex-col">
+                       <span className="text-white font-semibold text-base font-miralone">{username}</span>
+                       <span className="text-white/60 text-sm font-miralone">Account</span>
+                     </div>
+                   </div>
+                   
+                   {/* Action Buttons */}
+                   <div className="flex flex-col gap-3">
+                     <Button 
+                       variant="ghost" 
+                       className="w-full justify-start gap-3 h-11 text-white hover:bg-white/10 hover:text-white transition-all duration-200 font-miralone rounded-lg"
+                       onClick={() => navigate('/account')}
+                     >
+                       <UserCircle className="h-5 w-5" />
+                       Manage Account
+                     </Button>
+                     <Button 
+                       variant="ghost" 
+                       onClick={handleSignOut}
+                       className="w-full justify-start gap-3 h-11 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 font-miralone rounded-lg"
+                     >
+                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                       </svg>
+                       Sign Out
+                     </Button>
+                   </div>
+                 </div>
+               </HoverCardContent>
             </HoverCard>
           ) : (
             <Button

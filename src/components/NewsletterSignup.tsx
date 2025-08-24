@@ -47,7 +47,7 @@ const NewsletterSignup = () => {
       }
 
       toast({
-        title: "Welcome to Millicado! 🎉",
+        title: "Welcome to PLUGG'IN! 🎉",
         description: "You've been subscribed and will receive a welcome email shortly.",
       });
       setEmail("");

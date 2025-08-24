@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Shield } from "lucide-react";
 
-const ADMIN_EMAIL = "corbanmwiza@gmail.com";
+const ADMIN_EMAILS = ["corbanmwiza@gmail.com", "jeanlucniyonsaba46@gmail.com"];
 
 const AdminAuth = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +20,7 @@ const AdminAuth = () => {
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (email !== ADMIN_EMAIL) {
+    if (!ADMIN_EMAILS.includes(email)) {
       toast({
         title: "Access Denied",
         description: "This admin panel is restricted to authorized users only.",
@@ -32,7 +32,7 @@ const AdminAuth = () => {
     setLoading(true);
     
     const { error } = await supabase.auth.signInWithOtp({
-      email: ADMIN_EMAIL,
+      email: email,
       options: {
         emailRedirectTo: `${window.location.origin}/admin`
       }
@@ -61,7 +61,7 @@ const AdminAuth = () => {
     setLoading(true);
     
     const { data, error } = await supabase.auth.verifyOtp({
-      email: ADMIN_EMAIL,
+      email: email,
       token: otp,
       type: 'email'
     });

@@ -117,11 +117,11 @@ const ExternalCheckout = () => {
       <div className="relative w-full max-w-md z-10">
         <div className="text-center mb-8">
           <img 
-            src="/lovable-uploads/761c3dec-7031-4392-b6d8-70525efd46e2.png" 
-            alt="Millicado Logo" 
+            src="/lovable-uploads/81b3af56-15f1-4535-8e61-b2a94a4afd4e.png" 
+            alt="PLUGG'IN Logo" 
             className="h-16 w-auto mx-auto mb-2"
           />
-          <h1 className="text-2xl font-bold font-revans text-white/90 mb-1">MILLICADO</h1>
+          <h1 className="text-2xl font-bold font-revans text-white/90 mb-1">PLUGG'IN</h1>
           <p className="text-white/60 font-miralone">Complete your purchase</p>
         </div>
 

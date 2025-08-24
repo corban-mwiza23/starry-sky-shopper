@@ -13,7 +13,7 @@ import { User } from "@supabase/supabase-js";
 import { useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 
-const ADMIN_EMAIL = "corbanmwiza@gmail.com";
+const ADMIN_EMAILS = ["corbanmwiza@gmail.com", "jeanlucniyonsaba46@gmail.com"];
 
 const Admin = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -34,7 +34,7 @@ const Admin = () => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
-      if (!session || session.user.email !== ADMIN_EMAIL) {
+      if (!session || !ADMIN_EMAILS.includes(session.user.email || "")) {
         navigate("/admin-auth");
         return;
       }
@@ -46,7 +46,7 @@ const Admin = () => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (!session || session.user.email !== ADMIN_EMAIL) {
+        if (!session || !ADMIN_EMAILS.includes(session.user.email || "")) {
           navigate("/admin-auth");
           return;
         }
