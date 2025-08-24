@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +12,7 @@ import { User } from "@supabase/supabase-js";
 import { useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 
-const ADMIN_EMAIL = "corbanmwiza@gmail.com";
+const ADMIN_EMAILS = ["corbanmwiza@gmail.com", "jeanlucniyonsaba46@gmail.com"];
 
 const Admin = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -24,7 +23,7 @@ const Admin = () => {
     totalProfit: 0,
     revenueGrowth: 0,
     ordersGrowth: 0,
-    profitGrowth: 0
+    profitGrowth: 0,
   });
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -32,28 +31,30 @@ const Admin = () => {
   useEffect(() => {
     // Check authentication status
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session || session.user.email !== ADMIN_EMAIL) {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session || !ADMIN_EMAILS.includes(session.user.email || "")) {
         navigate("/admin-auth");
         return;
       }
-      
+
       setUser(session.user);
       setLoading(false);
     };
 
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (!session || session.user.email !== ADMIN_EMAIL) {
-          navigate("/admin-auth");
-          return;
-        }
-        setUser(session.user);
-        setLoading(false);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session || !ADMIN_EMAILS.includes(session.user.email || "")) {
+        navigate("/admin-auth");
+        return;
       }
-    );
+      setUser(session.user);
+      setLoading(false);
+    });
 
     checkAuth();
 
@@ -66,50 +67,92 @@ const Admin = () => {
     const fetchStats = async () => {
       // Fetch current month's data
       const currentDate = new Date();
-      const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-      const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59);
+      const firstDayOfMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        1,
+      );
+      const lastDayOfMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+        0,
+        23,
+        59,
+        59,
+      );
 
-      console.log('Date range:', {
+      console.log("Date range:", {
         firstDayOfMonth: firstDayOfMonth.toISOString(),
-        lastDayOfMonth: lastDayOfMonth.toISOString()
+        lastDayOfMonth: lastDayOfMonth.toISOString(),
       });
 
       const { data: currentMonthData, error: currentError } = await supabase
-        .from('orders')
-        .select('total_price, created_at')
-        .gte('created_at', firstDayOfMonth.toISOString())
-        .lte('created_at', lastDayOfMonth.toISOString());
+        .from("orders")
+        .select("total_price, created_at")
+        .gte("created_at", firstDayOfMonth.toISOString())
+        .lte("created_at", lastDayOfMonth.toISOString());
 
       // Fetch previous month's data
-      const firstDayOfLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
-      const lastDayOfLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0, 23, 59, 59);
+      const firstDayOfLastMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() - 1,
+        1,
+      );
+      const lastDayOfLastMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        0,
+        23,
+        59,
+        59,
+      );
 
       const { data: lastMonthData, error: lastError } = await supabase
-        .from('orders')
-        .select('total_price, created_at')
-        .gte('created_at', firstDayOfLastMonth.toISOString())
-        .lte('created_at', lastDayOfLastMonth.toISOString());
+        .from("orders")
+        .select("total_price, created_at")
+        .gte("created_at", firstDayOfLastMonth.toISOString())
+        .lte("created_at", lastDayOfLastMonth.toISOString());
 
       if (currentError || lastError) {
-        console.error('Error fetching stats:', currentError || lastError);
+        console.error("Error fetching stats:", currentError || lastError);
         return;
       }
 
-      const typedCurrentData = currentMonthData as Pick<Order, 'total_price' | 'created_at'>[];
-      const typedLastData = lastMonthData as Pick<Order, 'total_price' | 'created_at'>[];
+      const typedCurrentData = currentMonthData as Pick<
+        Order,
+        "total_price" | "created_at"
+      >[];
+      const typedLastData = lastMonthData as Pick<
+        Order,
+        "total_price" | "created_at"
+      >[];
 
-      const currentRevenue = typedCurrentData?.reduce((sum, order) => sum + Number(order.total_price), 0) || 0;
-      const lastRevenue = typedLastData?.reduce((sum, order) => sum + Number(order.total_price), 0) || 0;
-      const revenueGrowth = lastRevenue ? ((currentRevenue - lastRevenue) / lastRevenue) * 100 : 0;
+      const currentRevenue =
+        typedCurrentData?.reduce(
+          (sum, order) => sum + Number(order.total_price),
+          0,
+        ) || 0;
+      const lastRevenue =
+        typedLastData?.reduce(
+          (sum, order) => sum + Number(order.total_price),
+          0,
+        ) || 0;
+      const revenueGrowth = lastRevenue
+        ? ((currentRevenue - lastRevenue) / lastRevenue) * 100
+        : 0;
 
       const currentOrders = typedCurrentData?.length || 0;
       const lastOrders = typedLastData?.length || 0;
-      const ordersGrowth = lastOrders ? ((currentOrders - lastOrders) / lastOrders) * 100 : 0;
+      const ordersGrowth = lastOrders
+        ? ((currentOrders - lastOrders) / lastOrders) * 100
+        : 0;
 
       // Assuming 30% profit margin for demonstration
       const currentProfit = currentRevenue * 0.3;
       const lastProfit = lastRevenue * 0.3;
-      const profitGrowth = lastProfit ? ((currentProfit - lastProfit) / lastProfit) * 100 : 0;
+      const profitGrowth = lastProfit
+        ? ((currentProfit - lastProfit) / lastProfit) * 100
+        : 0;
 
       setStats({
         totalRevenue: currentRevenue,
@@ -117,7 +160,7 @@ const Admin = () => {
         totalProfit: currentProfit,
         revenueGrowth,
         ordersGrowth,
-        profitGrowth
+        profitGrowth,
       });
     };
 
@@ -125,8 +168,12 @@ const Admin = () => {
 
     // Set up real-time subscription for stats updates
     const subscription = supabase
-      .channel('orders_stats')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, fetchStats)
+      .channel("orders_stats")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders" },
+        fetchStats,
+      )
       .subscribe();
 
     return () => {
@@ -155,9 +202,9 @@ const Admin = () => {
       <div className="max-w-[1400px] mx-auto p-8">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <img 
-              src="/lovable-uploads/81b3af56-15f1-4535-8e61-b2a94a4afd4e.png" 
-              alt="PLUGG'IN Logo" 
+            <img
+              src="/lovable-uploads/81b3af56-15f1-4535-8e61-b2a94a4afd4e.png"
+              alt="PLUGG'IN Logo"
               className="h-20 w-auto"
             />
           </div>
@@ -171,26 +218,37 @@ const Admin = () => {
             Logout
           </Button>
         </div>
-        
-        <h1 className="text-3xl font-bold text-foreground mb-8 text-center">Sales Dashboard</h1>
-        
+
+        <h1 className="text-3xl font-bold text-foreground mb-8 text-center">
+          Sales Dashboard
+        </h1>
+
         <div className="grid gap-8">
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <StatsCard
               title="Total Revenue"
-              value={`$${stats.totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-              trend={{ value: Number(stats.revenueGrowth.toFixed(2)), isPositive: stats.revenueGrowth > 0 }}
+              value={`$${stats.totalRevenue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+              trend={{
+                value: Number(stats.revenueGrowth.toFixed(2)),
+                isPositive: stats.revenueGrowth > 0,
+              }}
             />
             <StatsCard
               title="Total Orders"
               value={stats.totalOrders}
-              trend={{ value: Number(stats.ordersGrowth.toFixed(2)), isPositive: stats.ordersGrowth > 0 }}
+              trend={{
+                value: Number(stats.ordersGrowth.toFixed(2)),
+                isPositive: stats.ordersGrowth > 0,
+              }}
             />
             <StatsCard
               title="Total Profit"
-              value={`$${stats.totalProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-              trend={{ value: Number(stats.profitGrowth.toFixed(2)), isPositive: stats.profitGrowth > 0 }}
+              value={`$${stats.totalProfit.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+              trend={{
+                value: Number(stats.profitGrowth.toFixed(2)),
+                isPositive: stats.profitGrowth > 0,
+              }}
             />
           </div>
 

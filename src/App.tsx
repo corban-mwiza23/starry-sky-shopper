@@ -1,5 +1,10 @@
-
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useRoutes,
+} from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "@/pages/Index";
@@ -9,6 +14,7 @@ import Login from "@/pages/Login";
 import Account from "@/pages/Account";
 import ExternalCheckout from "@/pages/ExternalCheckout";
 import { Toaster } from "@/components/ui/toaster";
+import routes from "tempo-routes";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -18,19 +24,23 @@ function App() {
     // Check initial auth state
     const checkAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         setIsAuthenticated(!!session);
       } catch (error) {
-        console.error('Auth check error:', error);
+        console.error("Auth check error:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    
+
     checkAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
     });
 
@@ -44,31 +54,24 @@ function App() {
 
   return (
     <Router>
+      {import.meta.env.VITE_TEMPO && useRoutes(routes)}
       <Routes>
-        <Route 
-          path="/login" 
-          element={isAuthenticated ? <Navigate to="/" /> : <Login />} 
+        <Route
+          path="/login"
+          element={isAuthenticated ? <Navigate to="/" /> : <Login />}
         />
-        <Route 
-          path="/" 
-          element={isAuthenticated ? <Index /> : <Navigate to="/login" />} 
+        <Route
+          path="/"
+          element={isAuthenticated ? <Index /> : <Navigate to="/login" />}
         />
-        <Route 
-          path="/admin-auth" 
-          element={<AdminAuth />} 
+        <Route path="/admin-auth" element={<AdminAuth />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route
+          path="/account"
+          element={isAuthenticated ? <Account /> : <Navigate to="/login" />}
         />
-        <Route 
-          path="/admin" 
-          element={<Admin />} 
-        />
-        <Route 
-          path="/account" 
-          element={isAuthenticated ? <Account /> : <Navigate to="/login" />} 
-        />
-        <Route 
-          path="/checkout" 
-          element={<ExternalCheckout />} 
-        />
+        <Route path="/checkout" element={<ExternalCheckout />} />
+        {import.meta.env.VITE_TEMPO && <Route path="/tempobook/*" />}
       </Routes>
       <Toaster />
     </Router>

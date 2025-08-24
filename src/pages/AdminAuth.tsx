@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Shield } from "lucide-react";
 
-const ADMIN_EMAIL = "corbanmwiza@gmail.com";
+const ADMIN_EMAILS = ["corbanmwiza@gmail.com", "jeanlucniyonsaba46@gmail.com"];
 
 const AdminAuth = () => {
   const [email, setEmail] = useState("");
@@ -19,8 +19,8 @@ const AdminAuth = () => {
 
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (email !== ADMIN_EMAIL) {
+
+    if (!ADMIN_EMAILS.includes(email)) {
       toast({
         title: "Access Denied",
         description: "This admin panel is restricted to authorized users only.",
@@ -30,12 +30,12 @@ const AdminAuth = () => {
     }
 
     setLoading(true);
-    
+
     const { error } = await supabase.auth.signInWithOtp({
-      email: ADMIN_EMAIL,
+      email: email,
       options: {
-        emailRedirectTo: `${window.location.origin}/admin`
-      }
+        emailRedirectTo: `${window.location.origin}/admin`,
+      },
     });
 
     if (error) {
@@ -51,19 +51,19 @@ const AdminAuth = () => {
         description: "Check your email for the verification code.",
       });
     }
-    
+
     setLoading(false);
   };
 
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     setLoading(true);
-    
+
     const { data, error } = await supabase.auth.verifyOtp({
-      email: ADMIN_EMAIL,
+      email: email,
       token: otp,
-      type: 'email'
+      type: "email",
     });
 
     if (error) {
@@ -79,7 +79,7 @@ const AdminAuth = () => {
       });
       navigate("/admin");
     }
-    
+
     setLoading(false);
   };
 
@@ -110,11 +110,7 @@ const AdminAuth = () => {
                 required
               />
             </div>
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={loading}
-            >
+            <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Sending..." : "Send OTP"}
             </Button>
           </form>
@@ -136,16 +132,12 @@ const AdminAuth = () => {
                 Check your email for the verification code
               </p>
             </div>
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={loading}
-            >
+            <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Verifying..." : "Verify & Access"}
             </Button>
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               className="w-full"
               onClick={() => {
                 setOtpSent(false);

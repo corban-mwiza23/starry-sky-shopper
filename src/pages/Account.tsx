@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -35,27 +34,29 @@ const Account = () => {
   useEffect(() => {
     const getProfile = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (!user) {
-          navigate('/login');
+          navigate("/login");
           return;
         }
 
         const { data: profile } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('id', user.id)
+          .from("profiles")
+          .select("username")
+          .eq("id", user.id)
           .maybeSingle();
-        
+
         setUsername(profile?.username || "");
         setEmail(user.email || "");
 
         // First get the orders
         const { data: orderData, error: orderError } = await supabase
-          .from('orders')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+          .from("orders")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
 
         if (orderError) throw orderError;
         if (!orderData) return;
@@ -64,23 +65,23 @@ const Account = () => {
         const ordersWithProducts = await Promise.all(
           orderData.map(async (order) => {
             const { data: productData } = await supabase
-              .from('products')
-              .select('name')
-              .eq('id', order.product_id)
+              .from("products")
+              .select("name")
+              .eq("id", order.product_id)
               .single();
 
             return {
               ...order,
-              products: { 
-                name: productData?.name || 'Unknown Product' 
-              }
+              products: {
+                name: productData?.name || "Unknown Product",
+              },
             } as ExtendedOrder;
-          })
+          }),
         );
 
         setOrders(ordersWithProducts);
       } catch (error) {
-        console.error('Error fetching profile:', error);
+        console.error("Error fetching profile:", error);
         toast({
           title: "Error",
           description: "Failed to load profile data",
@@ -94,7 +95,9 @@ const Account = () => {
 
   const updateProfile = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // Make sure id is required for the upsert operation
@@ -104,9 +107,7 @@ const Account = () => {
         updated_at: new Date().toISOString(),
       };
 
-      const { error } = await supabase
-        .from('profiles')
-        .upsert(updates);
+      const { error } = await supabase.from("profiles").upsert(updates);
 
       if (error) throw error;
 
@@ -126,7 +127,7 @@ const Account = () => {
   const updatePassword = async () => {
     try {
       const { error } = await supabase.auth.updateUser({
-        password: newPassword
+        password: newPassword,
       });
 
       if (error) throw error;
@@ -135,7 +136,7 @@ const Account = () => {
         title: "Success",
         description: "Password updated successfully",
       });
-      
+
       setNewPassword("");
     } catch (error) {
       toast({
@@ -146,7 +147,7 @@ const Account = () => {
     }
   };
 
-  const filteredOrders = orders.filter(order => {
+  const filteredOrders = orders.filter((order) => {
     if (activeTab === "all") return true;
     return order.status === activeTab;
   });
@@ -156,52 +157,58 @@ const Account = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-center mb-8">
-            <img 
-              src="/lovable-uploads/761c3dec-7031-4392-b6d8-70525efd46e2.png" 
-              alt="Millicado Logo" 
+            <img
+              src="/lovable-uploads/81b3af56-15f1-4535-8e61-b2a94a4afd4e.png"
+              alt="PLUGG'IN Logo"
               className="h-20 w-auto"
             />
           </div>
-          
-          <h1 className="text-3xl font-bold mb-8 text-center">Account Management</h1>
-          
+
+          <h1 className="text-3xl font-bold mb-8 text-center">
+            Account Management
+          </h1>
+
           <div className="grid gap-8 md:grid-cols-[300px,1fr]">
             {/* Profile information section */}
             <div className="space-y-6 bg-white/5 p-6 rounded-lg">
-              <h2 className="text-xl font-semibold mb-4">Profile Information</h2>
-              
+              <h2 className="text-xl font-semibold mb-4">
+                Profile Information
+              </h2>
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" value={email} disabled className="bg-white/5" />
+                <Input
+                  id="email"
+                  value={email}
+                  disabled
+                  className="bg-white/5"
+                />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="username">Username</Label>
-                <Input 
-                  id="username" 
+                <Input
+                  id="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="bg-white/5"
                 />
               </div>
 
-              <Button 
-                onClick={updateProfile}
-                className="w-full"
-              >
+              <Button onClick={updateProfile} className="w-full">
                 Update Profile
               </Button>
 
               <div className="space-y-2 pt-4 border-t border-white/10">
                 <Label htmlFor="password">New Password</Label>
-                <Input 
+                <Input
                   id="password"
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="bg-white/5"
                 />
-                <Button 
+                <Button
                   onClick={updatePassword}
                   className="w-full"
                   disabled={!newPassword}
@@ -243,22 +250,31 @@ const Account = () => {
                           </TableRow>
                         ) : (
                           filteredOrders.map((order) => (
-                            <TableRow key={order.id} className="hover:bg-white/5">
+                            <TableRow
+                              key={order.id}
+                              className="hover:bg-white/5"
+                            >
                               <TableCell>#{order.id}</TableCell>
                               <TableCell>{order.products.name}</TableCell>
                               <TableCell>{order.quantity}</TableCell>
                               <TableCell>${order.total_price}</TableCell>
                               <TableCell>
-                                <span className={`inline-block px-2 py-1 rounded-full text-xs ${
-                                  order.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                  order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                  'bg-red-100 text-red-800'
-                                }`}>
+                                <span
+                                  className={`inline-block px-2 py-1 rounded-full text-xs ${
+                                    order.status === "completed"
+                                      ? "bg-green-100 text-green-800"
+                                      : order.status === "pending"
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : "bg-red-100 text-red-800"
+                                  }`}
+                                >
                                   {order.status}
                                 </span>
                               </TableCell>
                               <TableCell>
-                                {new Date(order.created_at).toLocaleDateString()}
+                                {new Date(
+                                  order.created_at,
+                                ).toLocaleDateString()}
                               </TableCell>
                             </TableRow>
                           ))
