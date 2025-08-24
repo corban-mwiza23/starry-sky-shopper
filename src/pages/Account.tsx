@@ -247,7 +247,7 @@ const Account = () => {
                               <TableCell>#{order.id}</TableCell>
                               <TableCell>{order.products.name}</TableCell>
                               <TableCell>{order.quantity}</TableCell>
-                              <TableCell>${order.total_price}</TableCell>
+                              <TableCell>{order.total_price.toLocaleString()} RWF</TableCell>
                               <TableCell>
                                 <span className={`inline-block px-2 py-1 rounded-full text-xs ${
                                   order.status === 'completed' ? 'bg-green-100 text-green-800' :

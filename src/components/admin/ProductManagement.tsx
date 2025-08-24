@@ -361,7 +361,7 @@ const ProductManagement = () => {
                   )}
                 </div>
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-600">${product.price}</p>
+                  <p className="text-sm text-gray-600">{product.price.toLocaleString()} RWF</p>
                   {product.category && (
                     <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700 capitalize">
                       {product.category}

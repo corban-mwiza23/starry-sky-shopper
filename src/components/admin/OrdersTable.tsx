@@ -23,6 +23,9 @@ interface ExtendedOrder extends Order {
   products: {
     name: string;
   };
+  shipping_address?: {
+    phone_number?: string | null;
+  };
 }
 
 const OrdersTable = () => {
@@ -56,19 +59,29 @@ const OrdersTable = () => {
       if (orderError) throw orderError;
       if (!orderData) return;
 
-      // Then fetch product names for each order
+      // Then fetch product names and shipping addresses for each order
       const ordersWithProducts = await Promise.all(
         orderData.map(async (order) => {
-          const { data: productData } = await supabase
-            .from('products')
-            .select('name')
-            .eq('id', order.product_id)
-            .single();
+          const [productData, shippingData] = await Promise.all([
+            supabase
+              .from('products')
+              .select('name')
+              .eq('id', order.product_id)
+              .single(),
+            supabase
+              .from('shipping_addresses')
+              .select('phone_number')
+              .eq('order_id', order.id)
+              .single()
+          ]);
 
           return {
             ...order,
             products: { 
               name: productData?.name || 'Unknown Product' 
+            },
+            shipping_address: {
+              phone_number: shippingData?.phone_number || null
             }
           } as ExtendedOrder;
         })
@@ -125,6 +138,7 @@ const OrdersTable = () => {
             <TableRow>
               <TableHead>Order ID</TableHead>
               <TableHead>Customer</TableHead>
+              <TableHead>Phone</TableHead>
               <TableHead>Product</TableHead>
               <TableHead>Quantity</TableHead>
               <TableHead>Total</TableHead>
@@ -136,7 +150,7 @@ const OrdersTable = () => {
           <TableBody>
             {orders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8">
+                <TableCell colSpan={9} className="text-center py-8">
                   No orders found
                 </TableCell>
               </TableRow>
@@ -145,9 +159,18 @@ const OrdersTable = () => {
                 <TableRow key={order.id}>
                   <TableCell>#{order.id}</TableCell>
                   <TableCell>{order.customer_name}</TableCell>
+                  <TableCell>
+                    {order.shipping_address?.phone_number ? (
+                      <span className="font-mono text-sm">
+                        +250 {order.shipping_address.phone_number}
+                      </span>
+                    ) : (
+                      <span className="text-gray-500 text-sm">Not provided</span>
+                    )}
+                  </TableCell>
                   <TableCell>{order.products.name}</TableCell>
                   <TableCell>{order.quantity}</TableCell>
-                  <TableCell>${order.total_price}</TableCell>
+                  <TableCell>{order.total_price.toLocaleString()} RWF</TableCell>
                    <TableCell>
                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                        order.status === 'completed' ? 'bg-green-100 text-green-800' :

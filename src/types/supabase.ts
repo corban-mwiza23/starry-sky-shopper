@@ -30,6 +30,7 @@ export interface ShippingAddress {
   order_id: number;
   name: string;
   email: string;
+  phone_number?: string | null;
   address: string;
   city: string;
   zip_code: string;

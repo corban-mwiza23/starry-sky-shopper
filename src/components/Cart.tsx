@@ -87,7 +87,7 @@ const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
               />
               <div className="mt-6 sticky bottom-0 bg-cosmic-dark/95 backdrop-blur-sm p-4 border-t border-white/10">
                 <p className="text-white text-lg sm:text-xl font-semibold">
-                  Total: ${total.toFixed(2)}
+                  Total: {total.toLocaleString()} RWF
                 </p>
                 {!isCheckingOut ? (
                   <Button 

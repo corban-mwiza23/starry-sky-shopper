@@ -5,9 +5,11 @@ import { Product } from "@/types/database";
 
 interface ProductGridProps {
   onAddToCart: (id: number, name: string, price: number, image: string) => void;
+  selectedCategory?: string;
+  searchQuery?: string;
 }
 
-const ProductGrid = ({ onAddToCart }: ProductGridProps) => {
+const ProductGrid = ({ onAddToCart, selectedCategory, searchQuery }: ProductGridProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -35,6 +37,29 @@ const ProductGrid = ({ onAddToCart }: ProductGridProps) => {
     fetchProducts();
   }, []);
 
+  // Filter products based on category and search query
+  const filteredProducts = products.filter((product) => {
+    // Category filter
+    if (selectedCategory === 'new') {
+      // Show products created within last 7 days
+      if (product.created_at) {
+        const created = new Date(product.created_at);
+        const now = new Date();
+        const daysDiff = Math.floor((now.getTime() - created.getTime()) / (1000 * 3600 * 24));
+        if (daysDiff > 7) return false;
+      }
+    } else if (selectedCategory && product.category !== selectedCategory) {
+      return false;
+    }
+    
+    // Search filter
+    if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+    
+    return true;
+  });
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -48,9 +73,30 @@ const ProductGrid = ({ onAddToCart }: ProductGridProps) => {
     );
   }
 
+  // Show message if no products match the filters
+  if (filteredProducts.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-white/60 text-lg mb-4">
+          {searchQuery && selectedCategory 
+            ? `No ${selectedCategory}s found matching "${searchQuery}"`
+            : searchQuery 
+            ? `No products found matching "${searchQuery}"`
+            : selectedCategory 
+            ? `No ${selectedCategory}s available`
+            : 'No products available'
+          }
+        </div>
+        <div className="text-white/40 text-sm">
+          Try adjusting your search or category filters
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      {products.map((product) => (
+      {filteredProducts.map((product) => (
         <ProductCard
           key={product.id}
           {...product}

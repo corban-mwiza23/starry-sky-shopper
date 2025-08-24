@@ -108,7 +108,7 @@ const SalesChart = () => {
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(value) => `$${value}`}
+          tickFormatter={(value) => `${value.toLocaleString()} RWF`}
         />
         <Tooltip content={<CustomTooltip />} />
         <Area

@@ -16,6 +16,9 @@ import { useState } from "react";
 const checkoutSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
+  phoneNumber: z.string()
+    .min(1, "Phone number is required")
+    .regex(/^[7][0-9]{8}$/, "Please enter a valid Rwandan phone number (e.g., 0781234567)"),
   address: z.string().min(1, "Address is required"),
   city: z.string().min(1, "City is required"),
   zipCode: z.string().min(1, "ZIP Code is required"),
@@ -111,6 +114,7 @@ export const CartForm = ({ onBack, onComplete, totalAmount = 0 }: CartFormProps)
       order_id: latestOrder.id,
       name: data.name,
       email: data.email,
+      phone_number: data.phoneNumber,
       address: data.address,
       city: data.city,
       zip_code: data.zipCode,
@@ -148,6 +152,7 @@ export const CartForm = ({ onBack, onComplete, totalAmount = 0 }: CartFormProps)
       order_id: orderId,
       name: formData.name,
       email: formData.email,
+      phone_number: formData.phoneNumber,
       address: formData.address,
       city: formData.city,
       zip_code: formData.zipCode,
@@ -225,6 +230,32 @@ export const CartForm = ({ onBack, onComplete, totalAmount = 0 }: CartFormProps)
                 <Input {...field} type="email" className="bg-white/10 text-white border-white/20" />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="phoneNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-white">Phone Number</FormLabel>
+              <FormControl>
+                <div className="flex">
+                  <div className="flex items-center justify-center px-3 bg-white/20 text-white border border-white/20 border-r-0 rounded-l-md">
+                    <span className="text-sm font-medium">+250</span>
+                  </div>
+                  <Input 
+                    {...field} 
+                    type="tel" 
+                    placeholder="0781234567"
+                    className="bg-white/10 text-white border-white/20 rounded-l-none focus:ring-0 focus:border-white/40" 
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+              <p className="text-xs text-white/60 mt-1">
+                Enter your phone number without the country code (e.g., 0781234567)
+              </p>
             </FormItem>
           )}
         />

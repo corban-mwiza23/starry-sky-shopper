@@ -179,7 +179,7 @@ const Admin = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <StatsCard
               title="Total Revenue"
-              value={`$${stats.totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+              value={`${stats.totalRevenue.toLocaleString()} RWF`}
               trend={{ value: Number(stats.revenueGrowth.toFixed(2)), isPositive: stats.revenueGrowth > 0 }}
             />
             <StatsCard
@@ -189,7 +189,7 @@ const Admin = () => {
             />
             <StatsCard
               title="Total Profit"
-              value={`$${stats.totalProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+              value={`${stats.totalProfit.toLocaleString()} RWF`}
               trend={{ value: Number(stats.profitGrowth.toFixed(2)), isPositive: stats.profitGrowth > 0 }}
             />
           </div>

@@ -167,13 +167,13 @@ const ExternalCheckout = () => {
                     <p className="text-white/70">Quantity: 1</p>
                   </div>
                   <div className="text-white font-semibold">
-                    ${productDetails.price.toFixed(2)}
+                    {productDetails.price.toLocaleString()} RWF
                   </div>
                 </div>
                 <div className="border-t border-white/10 mt-2 pt-4">
                   <div className="flex justify-between">
                     <span className="text-white font-semibold">Total:</span>
-                    <span className="text-white font-semibold">${productDetails.price.toFixed(2)}</span>
+                    <span className="text-white font-semibold">{productDetails.price.toLocaleString()} RWF</span>
                   </div>
                 </div>
               </CardContent>

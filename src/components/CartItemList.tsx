@@ -15,7 +15,7 @@ export const CartItemList = ({ items, onUpdateQuantity, onRemoveItem }: CartItem
           <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />
           <div className="flex-1">
             <p className="text-white">{item.name}</p>
-            <p className="text-sm text-cosmic-light">${item.price}</p>
+            <p className="text-sm text-cosmic-light">{item.price.toLocaleString()} RWF</p>
             <div className="flex items-center gap-2 mt-2">
               <Button 
                 variant="outline" 
@@ -44,7 +44,7 @@ export const CartItemList = ({ items, onUpdateQuantity, onRemoveItem }: CartItem
               </Button>
             </div>
           </div>
-          <p className="text-white">${(item.price * item.quantity).toFixed(2)}</p>
+          <p className="text-white">{(item.price * item.quantity).toLocaleString()} RWF</p>
         </div>
       ))}
     </div>

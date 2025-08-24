@@ -35,6 +35,7 @@ export interface ShippingAddress {
   order_id?: number | null;
   name: string;
   email: string;
+  phone_number?: string | null;
   address: string;
   city: string;
   zip_code: string;
