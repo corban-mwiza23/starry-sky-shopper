@@ -175,7 +175,8 @@ const handler = async (req: Request): Promise<Response> => {
       success: true,
       message: "OTP verified successfully",
       user: { id: userId, email },
-      session: sessionData.properties
+      // Send the action link for the client to handle the session
+      action_link: sessionData.properties.action_link
     }), {
       status: 200,
       headers: {

@@ -38,13 +38,38 @@ const NavBar = ({ cartItems, setCartItems, onOrderSubmit }: NavBarProps) => {
             .maybeSingle();
           
           setUsername(profile?.username || user.email);
+        } else {
+          setUsername(null);
+          setUserEmail(null);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
       }
     };
 
+    // Get initial session
     getProfile();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          setUserEmail(session.user.email);
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('username')
+            .eq('id', session.user.id)
+            .maybeSingle();
+          
+          setUsername(profile?.username || session.user.email);
+        } else {
+          setUsername(null);
+          setUserEmail(null);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleSignOut = async () => {

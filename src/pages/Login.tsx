@@ -158,21 +158,28 @@ const Login = () => {
         return;
       }
 
-      // Create a proper Supabase session using the session data
-      if (data?.session?.access_token) {
-        const { error: sessionError } = await supabase.auth.setSession({
-          access_token: data.session.access_token,
-          refresh_token: data.session.refresh_token
-        });
-
-        if (sessionError) {
-          console.error('Session creation error:', sessionError);
-          toast({
-            title: "Login Error",
-            description: "Failed to create session. Please try again.",
-            variant: "destructive",
+      // Handle the magic link session by navigating to it
+      if (data?.action_link) {
+        // Extract the token from the action link and use it to set the session
+        const url = new URL(data.action_link);
+        const token = url.searchParams.get('token');
+        const type = url.searchParams.get('type');
+        
+        if (token && type) {
+          const { error: sessionError } = await supabase.auth.verifyOtp({
+            token_hash: token,
+            type: type as any
           });
-          return;
+
+          if (sessionError) {
+            console.error('Session verification error:', sessionError);
+            toast({
+              title: "Login Error",
+              description: "Failed to create session. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
         }
       }
 
