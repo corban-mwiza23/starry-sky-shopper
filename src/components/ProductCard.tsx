@@ -63,14 +63,14 @@ const ProductCard = ({
       <div className="flex flex-col items-center gap-1 mb-2">
         {is_on_sale && discount_percentage ? (
           <>
-            <p className="text-white/80 font-mono text-sm line-through">£{price.toFixed(2)}</p>
-            <p className="text-red-500 font-mono text-lg font-bold">£{finalPrice.toFixed(2)}</p>
+            <p className="text-white/80 font-mono text-sm line-through">RWF{price.toFixed(2)}</p>
+            <p className="text-red-500 font-mono text-lg font-bold">RWF{finalPrice.toFixed(2)}</p>
           </>
         ) : (
-          <p className="text-white/80 font-mono text-sm">£{price.toFixed(2)}</p>
+          <p className="text-white/80 font-mono text-sm">RWF{price.toFixed(2)}</p>
         )}
       </div>
-      <Button 
+      <Button
         onClick={handleAddToCart}
         className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm border border-white/20"
       >
