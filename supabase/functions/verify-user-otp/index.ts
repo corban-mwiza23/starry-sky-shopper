@@ -131,21 +131,42 @@ const handler = async (req: Request): Promise<Response> => {
       console.log("Created new user:", userId);
     }
 
-    // Generate access token for the user
-    const { data: sessionData, error: sessionError } = await supabase.auth.admin.generateLink({
-      type: 'signup',
-      email: email,
-    });
-
-    if (sessionError) {
-      console.error("Error generating session:", sessionError);
-      return new Response(
-        JSON.stringify({ error: "Failed to create session" }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
-      );
+    // Generate session tokens for the user
+    let sessionData;
+    if (existingUser) {
+      // For existing users, generate a session using magiclink type
+      const { data, error: sessionError } = await supabase.auth.admin.generateLink({
+        type: 'magiclink',
+        email: email,
+      });
+      if (sessionError) {
+        console.error("Error generating session for existing user:", sessionError);
+        return new Response(
+          JSON.stringify({ error: "Failed to create session" }),
+          {
+            status: 500,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
+      sessionData = data;
+    } else {
+      // For new users, generate a session using signup type  
+      const { data, error: sessionError } = await supabase.auth.admin.generateLink({
+        type: 'signup',
+        email: email,
+      });
+      if (sessionError) {
+        console.error("Error generating session for new user:", sessionError);
+        return new Response(
+          JSON.stringify({ error: "Failed to create session" }),
+          {
+            status: 500,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
+      sessionData = data;
     }
 
     console.log("OTP verified successfully for user:", email);
