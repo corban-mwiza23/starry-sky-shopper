@@ -62,7 +62,22 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (!otpRecord) {
-      console.log("No valid OTP found for:", { email, otp: otp.substring(0, 2) + "****" });
+      console.log("No valid OTP found for:", { 
+        email, 
+        otp: otp.substring(0, 2) + "****",
+        searchTime: new Date().toISOString()
+      });
+      
+      // Debug: Check what OTPs exist for this email
+      const { data: debugOtps } = await supabase
+        .from('admin_otps')
+        .select('otp_code, expires_at, used, created_at')
+        .eq('email', email)
+        .order('created_at', { ascending: false })
+        .limit(3);
+      
+      console.log("Recent OTPs for email:", { email, debugOtps });
+      
       return new Response(
         JSON.stringify({ error: "Invalid or expired OTP code" }),
         {

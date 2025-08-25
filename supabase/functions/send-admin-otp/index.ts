@@ -97,7 +97,11 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("OTP sent successfully:", { email, otpCode, emailResponse });
+    console.log("OTP sent successfully:", { 
+      email, 
+      otpCode, 
+      emailResponse: emailResponse.data ? "Email sent" : emailResponse.error 
+    });
 
     return new Response(JSON.stringify({ 
       success: true,
