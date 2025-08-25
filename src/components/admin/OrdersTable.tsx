@@ -78,10 +78,10 @@ const OrdersTable = () => {
           return {
             ...order,
             products: { 
-              name: productData?.name || 'Unknown Product' 
+              name: productData.data?.name || 'Unknown Product' 
             },
             shipping_address: {
-              phone_number: shippingData?.phone_number || null
+              phone_number: shippingData.data?.phone_number || null
             }
           } as ExtendedOrder;
         })
