@@ -30,35 +30,34 @@ const Admin = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check admin verification status
-    const checkAdminAccess = () => {
-      const adminEmail = localStorage.getItem('admin_verified');
-      const verifiedAt = localStorage.getItem('admin_verified_at');
+    // Check authentication status
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       
-      // Check if admin verification exists and is recent (24 hours)
-      if (!adminEmail || !ADMIN_EMAILS.includes(adminEmail) || 
-          !verifiedAt || Date.now() - parseInt(verifiedAt) > 24 * 60 * 60 * 1000) {
-        localStorage.removeItem('admin_verified');
-        localStorage.removeItem('admin_verified_at');
+      if (!session || !ADMIN_EMAILS.includes(session.user.email || "")) {
         navigate("/admin-auth");
         return;
       }
       
-      // Create a mock user object for the verified admin
-      setUser({ 
-        id: adminEmail, 
-        email: adminEmail,
-        aud: 'authenticated',
-        role: 'authenticated',
-        user_metadata: {},
-        app_metadata: {},
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      } as User);
+      setUser(session.user);
       setLoading(false);
     };
 
-    checkAdminAccess();
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (!session || !ADMIN_EMAILS.includes(session.user.email || "")) {
+          navigate("/admin-auth");
+          return;
+        }
+        setUser(session.user);
+        setLoading(false);
+      }
+    );
+
+    checkAuth();
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   useEffect(() => {
@@ -135,9 +134,8 @@ const Admin = () => {
     };
   }, [user]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin_verified');
-    localStorage.removeItem('admin_verified_at');
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     navigate("/admin-auth");
   };
 

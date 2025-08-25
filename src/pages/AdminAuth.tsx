@@ -66,19 +66,48 @@ const AdminAuth = () => {
 
       if (error) throw error;
 
-      // OTP verified successfully, now handle authentication
-      console.log("OTP verified, granting admin access");
+      // OTP verified successfully, now handle authentication properly
+      console.log("OTP verified, creating admin user with proper auth");
       
-      toast({
-        title: "Access Granted",
-        description: "OTP verified successfully. Welcome to the admin panel!",
-      });
-      
-      // Store admin session info in localStorage to bypass normal auth
-      localStorage.setItem('admin_verified', email);
-      localStorage.setItem('admin_verified_at', Date.now().toString());
-      
-      navigate("/admin");
+      try {
+        // Generate a secure random password
+        const adminPassword = crypto.randomUUID();
+        
+        // Always try to create/update the admin user through our edge function
+        const { data: sessionData, error: sessionError } = await supabase.functions.invoke('create-admin-session', {
+          body: { email, adminPassword }
+        });
+        
+        if (sessionError) {
+          console.error("Session creation error:", sessionError);
+          throw sessionError;
+        }
+
+        // Now try to sign in with the password we just set
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: adminPassword
+        });
+
+        if (signInError) {
+          console.error("Sign in error:", signInError);
+          throw signInError;
+        }
+
+        console.log("Authentication successful");
+        toast({
+          title: "Access Granted",
+          description: "Welcome to the admin panel!",
+        });
+        navigate("/admin");
+      } catch (authError: any) {
+        console.error("Authentication error:", authError);
+        toast({
+          title: "Authentication Failed", 
+          description: authError.message || "Failed to authenticate after OTP verification",
+          variant: "destructive",
+        });
+      }
     } catch (error: any) {
       console.error("OTP verification error:", error);
       toast({

@@ -2,3 +2,6 @@ project_id = "yozeawddmurlpwvxxetc"
 
 [functions.mtn-momo-payment]
 verify_jwt = false
+
+[functions.create-admin-session]
+verify_jwt = false
