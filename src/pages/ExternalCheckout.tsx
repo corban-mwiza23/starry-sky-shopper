@@ -68,16 +68,46 @@ const ExternalCheckout = () => {
     if (!productDetails) return false;
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      let user;
+      
+      // Try to get existing user
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      
+      if (!currentUser) {
+        // Create anonymous user for guest checkout
+        console.log("No authenticated user found, creating anonymous user...");
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: `guest-${Date.now()}@temp.com`,
+          password: `temp-${Date.now()}`,
+        });
+        
+        if (signUpError) {
+          console.error('Error creating anonymous user:', signUpError);
+          toast({
+            title: "Error",
+            description: "Failed to create user session. Please try again.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        
+        user = signUpData.user;
+        console.log("Created anonymous user:", user?.id);
+      } else {
+        user = currentUser;
+        console.log("Using existing user:", user.id);
+      }
       
       if (!user) {
         toast({
           title: "Error",
-          description: "You must be logged in to place an order",
+          description: "Unable to create user session",
           variant: "destructive",
         });
         return false;
       }
+
+      console.log("Processing order for user:", user.id, "product:", productDetails.id);
 
       // Process single product order through edge function for proper inventory management
       const { data, error } = await supabase.functions.invoke('process-order', {
@@ -97,6 +127,16 @@ const ExternalCheckout = () => {
         toast({
           title: "Order Failed",
           description: error.message || "Failed to process your order. Please try again.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      if (data?.error) {
+        console.error('Order processing returned error:', data.error);
+        toast({
+          title: "Order Failed",
+          description: data.error,
           variant: "destructive",
         });
         return false;

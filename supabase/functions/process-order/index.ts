@@ -26,7 +26,36 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { items, customer_name, user_id }: ProcessOrderRequest = await req.json();
+    console.log("Processing order request...");
+    const requestBody = await req.json();
+    console.log("Request body:", JSON.stringify(requestBody));
+    
+    const { items, customer_name, user_id }: ProcessOrderRequest = requestBody;
+
+    // Validate required fields
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      console.error("Invalid items:", items);
+      return new Response(
+        JSON.stringify({ error: "Items array is required and cannot be empty" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    if (!customer_name || !user_id) {
+      console.error("Missing required fields:", { customer_name, user_id });
+      return new Response(
+        JSON.stringify({ error: "Customer name and user ID are required" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    console.log(`Processing order for user ${user_id}, customer: ${customer_name}, items: ${items.length}`);
 
     // Initialize Supabase client with service role key for admin operations
     const supabase = createClient(
@@ -155,8 +184,12 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: any) {
     console.error("Error in process-order function:", error);
+    console.error("Error stack:", error.stack);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message || "An unexpected error occurred",
+        details: error.toString()
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
