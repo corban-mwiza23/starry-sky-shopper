@@ -8,3 +8,18 @@ verify_jwt = false
 
 [functions.process-order]
 verify_jwt = false
+
+[functions.send-user-otp]
+verify_jwt = false
+
+[functions.verify-user-otp]
+verify_jwt = false
+
+[functions.send-admin-otp]
+verify_jwt = false
+
+[functions.verify-admin-otp]
+verify_jwt = false
+
+[functions.send-welcome-email]
+verify_jwt = false

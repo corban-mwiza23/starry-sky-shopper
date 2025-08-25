@@ -207,6 +207,33 @@ export type Database = {
           },
         ]
       }
+      user_otps: {
+        Row: {
+          created_at: string | null
+          email: string
+          expires_at: string
+          id: string
+          otp_code: string
+          used: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          expires_at: string
+          id?: string
+          otp_code: string
+          used?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          expires_at?: string
+          id?: string
+          otp_code?: string
+          used?: boolean | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -234,6 +261,10 @@ export type Database = {
     }
     Functions: {
       cleanup_expired_otps: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      cleanup_expired_user_otps: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
