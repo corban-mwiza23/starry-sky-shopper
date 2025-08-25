@@ -11,11 +11,13 @@ import { ArrowLeft, Mail, Shield, Loader2 } from "lucide-react";
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [step, setStep] = useState<"email" | "otp">("email");
+  const [step, setStep] = useState<"email" | "password" | "otp">("email");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [isNewUser, setIsNewUser] = useState(false);
 
   useEffect(() => {
     // Check if already logged in
@@ -36,36 +38,87 @@ const Login = () => {
     return () => clearTimeout(timer);
   }, [countdown]);
 
-  const handleSendOTP = async (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('send-user-otp', {
-        body: { email }
+      // Try to sign in with a dummy password to check if user exists
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password: 'dummy-password-to-check-existence'
+      });
+
+      if (error?.message === 'Invalid login credentials') {
+        // User doesn't exist, send OTP for registration
+        const { data: otpData, error: otpError } = await supabase.functions.invoke('send-user-otp', {
+          body: { email }
+        });
+
+        if (otpError) {
+          toast({
+            title: "Error",
+            description: "Failed to send verification code. Please try again.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        setIsNewUser(true);
+        setStep("otp");
+        setCountdown(60);
+        toast({
+          title: "Welcome! Let's verify your email",
+          description: `We've sent a 6-digit code to ${email}`,
+          className: "bg-white text-black border border-gray-200",
+        });
+      } else {
+        // User exists, show password field
+        setIsNewUser(false);
+        setStep("password");
+      }
+    } catch (error: any) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePasswordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) return;
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
       });
 
       if (error) {
-        console.error('OTP send error:', error);
         toast({
-          title: "Error",
-          description: "Failed to send verification code. Please try again.",
+          title: "Login Failed",
+          description: "Invalid email or password. Please try again.",
           variant: "destructive",
         });
         return;
       }
 
       toast({
-        title: "Code Sent!",
-        description: `We've sent a 6-digit code to ${email}`,
+        title: "Welcome back!",
+        description: "You've been successfully logged in.",
         className: "bg-white text-black border border-gray-200",
       });
-      
-      setStep("otp");
-      setCountdown(60); // 1 minute countdown
+
+      navigate("/account");
     } catch (error: any) {
-      console.error('Unexpected error:', error);
+      console.error('Login error:', error);
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
@@ -204,7 +257,9 @@ const Login = () => {
           />
           <h1 className="text-2xl font-bold font-revans text-white mb-1">PLUGG'IN</h1>
           <p className="text-white/60 font-miralone">
-            {step === "email" ? "Sign in to your account" : "Enter verification code"}
+            {step === "email" ? "Sign in to your account" : 
+             step === "password" ? "Enter your password" : 
+             "Enter verification code"}
           </p>
         </div>
 
@@ -213,23 +268,33 @@ const Login = () => {
             <div className="mx-auto w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mb-4">
               {step === "email" ? (
                 <Mail className="h-6 w-6 text-white" />
+              ) : step === "password" ? (
+                <Shield className="h-6 w-6 text-white" />
               ) : (
                 <Shield className="h-6 w-6 text-white" />
               )}
             </div>
             <CardTitle className="text-white text-xl">
-              {step === "email" ? "Welcome Back" : "Check Your Email"}
+              {step === "email" ? "Welcome Back" : 
+               step === "password" ? "Enter Password" : 
+               isNewUser ? "Create Your Account" : "Check Your Email"}
             </CardTitle>
+            {step === "password" && (
+              <p className="text-white/60 text-sm mt-2">
+                Welcome back! Please enter your password for<br />
+                <span className="font-semibold text-white">{email}</span>
+              </p>
+            )}
             {step === "otp" && (
               <p className="text-white/60 text-sm mt-2">
-                We sent a 6-digit code to<br />
+                {isNewUser ? "We're creating your account. " : ""}We sent a 6-digit code to<br />
                 <span className="font-semibold text-white">{email}</span>
               </p>
             )}
           </CardHeader>
           <CardContent>
             {step === "email" ? (
-              <form onSubmit={handleSendOTP} className="space-y-4">
+              <form onSubmit={handleEmailSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-white">Email Address</Label>
                   <Input
@@ -251,12 +316,54 @@ const Login = () => {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Sending Code...
+                      Checking...
                     </>
                   ) : (
-                    "Send Verification Code"
+                    "Continue"
                   )}
                 </Button>
+              </form>
+            ) : step === "password" ? (
+              <form onSubmit={handlePasswordLogin} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-white">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    placeholder="Enter your password"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                
+                <Button
+                  type="submit"
+                  disabled={isLoading || !password}
+                  className="w-full bg-white text-black hover:bg-gray-100 font-semibold py-6"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Signing In...
+                    </>
+                  ) : (
+                    "Sign In"
+                  )}
+                </Button>
+                
+                <div className="text-center">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => { setStep("email"); setPassword(""); }}
+                    className="text-white/60 hover:text-white hover:bg-white/10"
+                  >
+                    Change Email Address
+                  </Button>
+                </div>
               </form>
             ) : (
               <form onSubmit={handleVerifyOTP} className="space-y-6">
@@ -297,7 +404,7 @@ const Login = () => {
                   <Button
                     type="button"
                     variant="ghost"
-                    onClick={() => setStep("email")}
+                    onClick={() => { setStep("email"); setOtp(""); }}
                     className="text-white/60 hover:text-white hover:bg-white/10"
                   >
                     Change Email Address
