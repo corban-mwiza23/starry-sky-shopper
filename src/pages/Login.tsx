@@ -24,7 +24,7 @@ const Login = () => {
     const checkUser = async () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
-        navigate("/account");
+      navigate("/");
       }
     };
     checkUser();
@@ -116,7 +116,7 @@ const Login = () => {
         className: "bg-white text-black border border-gray-200",
       });
 
-      navigate("/account");
+      navigate("/");
     } catch (error: any) {
       console.error('Login error:', error);
       toast({
@@ -182,8 +182,8 @@ const Login = () => {
         className: "bg-white text-black border border-gray-200",
       });
 
-      // Navigate to account page
-      navigate("/account");
+      // Navigate to main products page
+      navigate("/");
     } catch (error: any) {
       console.error('Unexpected error:', error);
       toast({
