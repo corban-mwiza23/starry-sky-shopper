@@ -46,11 +46,24 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    // Get the user by email
-    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserByEmail(email);
+    // Get the user by email using listUsers and filter
+    const { data: usersData, error: usersError } = await supabaseAdmin.auth.admin.listUsers();
     
-    if (userError || !userData.user) {
-      console.error("User lookup error:", userError);
+    if (usersError) {
+      console.error("Error listing users:", usersError);
+      return new Response(
+        JSON.stringify({ error: "Failed to fetch users" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    const targetUser = usersData.users.find(user => user.email === email);
+    
+    if (!targetUser) {
+      console.error("User not found:", email);
       return new Response(
         JSON.stringify({ error: "User not found" }),
         {
@@ -62,7 +75,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Update user password and confirm email
     const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-      userData.user.id,
+      targetUser.id,
       {
         password: adminPassword,
         email_confirm: true
@@ -84,7 +97,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { error: roleError } = await supabaseAdmin
       .from('user_roles')
       .upsert({
-        user_id: userData.user.id,
+        user_id: targetUser.id,
         role: 'admin'
       });
 
@@ -98,7 +111,7 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(JSON.stringify({ 
       success: true,
       message: "Admin session created successfully",
-      user_id: userData.user.id
+      user_id: targetUser.id
     }), {
       status: 200,
       headers: {
