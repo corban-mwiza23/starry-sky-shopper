@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Shield } from "lucide-react";
@@ -66,40 +66,51 @@ const AdminAuth = () => {
 
       if (error) throw error;
 
-      // OTP verified successfully, now sign in or create the user
+      // OTP verified successfully, now create/authenticate the user
       console.log("OTP verified, attempting authentication");
       
       try {
-        // Try to sign in with email as password
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        // Generate a secure random password for the admin
+        const adminPassword = crypto.randomUUID();
+        
+        // First, try to create the user
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email: email,
-          password: email
+          password: adminPassword,
+          options: {
+            emailRedirectTo: `${window.location.origin}/admin`
+          }
         });
 
-        if (signInError && signInError.message?.includes("Invalid login credentials")) {
-          // User doesn't exist, create them
-          console.log("Creating new admin user");
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-            email: email,
-            password: email,
-            options: {
-              emailRedirectTo: `${window.location.origin}/admin`
-            }
-          });
+        if (signUpError) {
+          // If user already exists, we need to handle it differently
+          if (signUpError.message?.includes("User already registered")) {
+            // User exists but we can't sign them in without knowing their password
+            // Let's update their password instead using admin privileges
+            console.log("User exists, need admin intervention");
+            toast({
+              title: "Account Exists", 
+              description: "Your admin account exists. Contact system administrator for access.",
+              variant: "destructive",
+            });
+            return;
+          } else {
+            throw signUpError;
+          }
+        }
 
-          if (signUpError) throw signUpError;
+        // New user created successfully, now sign them in
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: adminPassword
+        });
 
-          // After signup, sign in immediately
-          const { error: signInAfterSignUpError } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: email
-          });
-
-          if (signInAfterSignUpError) throw signInAfterSignUpError;
-        } else if (signInError) {
+        if (signInError) {
+          console.error("Sign in error after signup:", signInError);
           throw signInError;
         }
 
+        console.log("Authentication successful");
         toast({
           title: "Access Granted",
           description: "Welcome to the admin panel!",
@@ -108,8 +119,8 @@ const AdminAuth = () => {
       } catch (authError: any) {
         console.error("Authentication error:", authError);
         toast({
-          title: "Authentication Failed",
-          description: "Failed to authenticate after OTP verification",
+          title: "Authentication Failed", 
+          description: authError.message || "Failed to authenticate after OTP verification",
           variant: "destructive",
         });
       }
