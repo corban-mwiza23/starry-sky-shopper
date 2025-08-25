@@ -31,24 +31,23 @@ const AdminAuth = () => {
 
     setLoading(true);
     
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/admin`
-      }
-    });
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
+    try {
+      const { data, error } = await supabase.functions.invoke('send-admin-otp', {
+        body: { email }
       });
-    } else {
+
+      if (error) throw error;
+
       setOtpSent(true);
       toast({
         title: "OTP Sent",
-        description: "Check your email for the verification code.",
+        description: "Check your email for the 6-digit verification code.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send OTP",
+        variant: "destructive",
       });
     }
     
@@ -60,24 +59,35 @@ const AdminAuth = () => {
     
     setLoading(true);
     
-    const { data, error } = await supabase.auth.verifyOtp({
-      email: email,
-      token: otp,
-      type: 'email'
-    });
-
-    if (error) {
-      toast({
-        title: "Invalid OTP",
-        description: error.message,
-        variant: "destructive",
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-admin-otp', {
+        body: { email, otp }
       });
-    } else if (data.user) {
+
+      if (error) throw error;
+
+      // The edge function has verified the OTP and created/updated the user
+      // Now we need to sign in the user on the client side
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: email // Using email as password for admin accounts
+      });
+
+      if (signInError) {
+        throw new Error("Authentication failed after OTP verification");
+      }
+      
       toast({
         title: "Access Granted",
         description: "Welcome to the admin panel!",
       });
       navigate("/admin");
+    } catch (error: any) {
+      toast({
+        title: "Invalid OTP",
+        description: error.message || "Invalid or expired OTP code",
+        variant: "destructive",
+      });
     }
     
     setLoading(false);
