@@ -101,15 +101,35 @@ const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
                     onBack={() => setIsCheckingOut(false)}
                     totalAmount={total}
                     onComplete={async (customerName) => {
-                      const { data: { user } } = await supabase.auth.getUser();
+                      let user;
+                      
+                      // Try to get existing user
+                      const { data: { user: currentUser } } = await supabase.auth.getUser();
+                      
+                      if (!currentUser) {
+                        // Create anonymous user for guest checkout
+                        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                          email: `guest-${Date.now()}@temp.com`,
+                          password: `temp-${Date.now()}`,
+                        });
+                        
+                        if (signUpError) {
+                          console.error('Error creating anonymous user:', signUpError);
+                          return false;
+                        }
+                        
+                        user = signUpData.user;
+                      } else {
+                        user = currentUser;
+                      }
+                      
                       if (!user) return false;
 
                       const success = await onOrderSubmit(customerName);
-                      if (success) {
-                        setItems([]);
-                        setIsCheckingOut(false);
-                        setIsSheetOpen(false);
-                      }
+                      // Always close the popup regardless of success/failure for better UX
+                      setItems([]);
+                      setIsCheckingOut(false);
+                      setIsSheetOpen(false);
                       return success;
                     }}
                   />
