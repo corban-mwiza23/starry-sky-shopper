@@ -80,59 +80,74 @@ const Cart = ({ items, setItems, onOrderSubmit }: CartProps) => {
             <p className="text-cosmic-light text-base sm:text-lg">Your cart is empty</p>
           ) : (
             <>
-              <CartItemList 
-                items={items}
-                onUpdateQuantity={handleUpdateQuantity}
-                onRemoveItem={handleRemoveItem}
-              />
-              <div className="mt-6 sticky bottom-0 bg-cosmic-dark/95 backdrop-blur-sm p-4 border-t border-white/10">
-                <p className="text-white text-lg sm:text-xl font-semibold">
-                  Total: {total.toLocaleString()} RWF
-                </p>
+              {!isCheckingOut && (
+                <CartItemList 
+                  items={items}
+                  onUpdateQuantity={handleUpdateQuantity}
+                  onRemoveItem={handleRemoveItem}
+                />
+              )}
+              <div className="mt-6 p-4 bg-cosmic-dark/95 backdrop-blur-sm border-t border-white/10">
                 {!isCheckingOut ? (
-                  <Button 
-                    onClick={handleProceedToCheckout}
-                    className="w-full mt-4 bg-white text-cosmic-dark hover:bg-cosmic-light sm:py-6 text-base sm:text-lg"
-                  >
-                    Proceed to Checkout
-                  </Button>
+                  <>
+                    <p className="text-white text-lg sm:text-xl font-semibold mb-4">
+                      Total: {total.toLocaleString()} RWF
+                    </p>
+                    <Button 
+                      onClick={handleProceedToCheckout}
+                      className="w-full bg-white text-cosmic-dark hover:bg-cosmic-light sm:py-6 text-base sm:text-lg font-semibold"
+                    >
+                      Proceed to Checkout
+                    </Button>
+                  </>
                 ) : (
-                  <CartForm 
-                    onBack={() => setIsCheckingOut(false)}
-                    totalAmount={total}
-                    onComplete={async (customerName) => {
-                      let user;
-                      
-                      // Try to get existing user
-                      const { data: { user: currentUser } } = await supabase.auth.getUser();
-                      
-                      if (!currentUser) {
-                        // Create anonymous user for guest checkout
-                        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-                          email: `guest-${Date.now()}@temp.com`,
-                          password: `temp-${Date.now()}`,
-                        });
+                  <div className="space-y-4">
+                    <div className="text-center border-b border-white/10 pb-4">
+                      <p className="text-white text-lg font-semibold">
+                        Order Total: {total.toLocaleString()} RWF
+                      </p>
+                      <p className="text-white/60 text-sm">
+                        {items.length} item{items.length > 1 ? 's' : ''} in cart
+                      </p>
+                    </div>
+                    <h3 className="text-white text-lg font-semibold">Shipping Information</h3>
+                    <CartForm 
+                      onBack={() => setIsCheckingOut(false)}
+                      totalAmount={total}
+                      onComplete={async (customerName) => {
+                        let user;
                         
-                        if (signUpError) {
-                          console.error('Error creating anonymous user:', signUpError);
-                          return false;
+                        // Try to get existing user
+                        const { data: { user: currentUser } } = await supabase.auth.getUser();
+                        
+                        if (!currentUser) {
+                          // Create anonymous user for guest checkout
+                          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                            email: `guest-${Date.now()}@temp.com`,
+                            password: `temp-${Date.now()}`,
+                          });
+                          
+                          if (signUpError) {
+                            console.error('Error creating anonymous user:', signUpError);
+                            return false;
+                          }
+                          
+                          user = signUpData.user;
+                        } else {
+                          user = currentUser;
                         }
                         
-                        user = signUpData.user;
-                      } else {
-                        user = currentUser;
-                      }
-                      
-                      if (!user) return false;
+                        if (!user) return false;
 
-                      const success = await onOrderSubmit(customerName);
-                      // Always close the popup regardless of success/failure for better UX
-                      setItems([]);
-                      setIsCheckingOut(false);
-                      setIsSheetOpen(false);
-                      return success;
-                    }}
-                  />
+                        const success = await onOrderSubmit(customerName);
+                        // Always close the popup regardless of success/failure for better UX
+                        setItems([]);
+                        setIsCheckingOut(false);
+                        setIsSheetOpen(false);
+                        return success;
+                      }}
+                    />
+                  </div>
                 )}
               </div>
             </>
