@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Trash2, Percent, Package, Upload, Link } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -135,8 +135,21 @@ const ProductManagement = () => {
     } else {
       toast({
         title: "Success",
-        description: `Product marked as ${is_sold_out ? 'sold out' : 'available'}`,
+        description: `Product ${is_sold_out ? 'marked as sold out' : 'marked as available'}`,
       });
+      
+      // If marking as available, ensure quantity is at least 1
+      if (!is_sold_out) {
+        const { error: quantityError } = await supabase
+          .from('products')
+          .update({ quantity: 1 })
+          .eq('id', id)
+          .eq('quantity', 0); // Only update if quantity is currently 0
+        
+        if (quantityError) {
+          console.error('Error updating quantity:', quantityError);
+        }
+      }
     }
   };
 
@@ -189,7 +202,7 @@ const ProductManagement = () => {
 
 
   const handleQuantityUpdate = async (id: number, quantity: number) => {
-    const is_sold_out = quantity === 0;
+    const is_sold_out = quantity <= 0;
 
     const { error } = await supabase
       .from('products')
@@ -206,7 +219,7 @@ const ProductManagement = () => {
     } else {
       toast({
         title: "Success",
-        description: "Quantity updated successfully",
+        description: `Quantity updated successfully${is_sold_out ? ' (marked as sold out)' : ''}`,
       });
     }
   };
@@ -417,7 +430,11 @@ const ProductManagement = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => handleSoldOutToggle(product.id, !product.is_sold_out)}
-                      className="h-6 text-xs px-2"
+                      className={`h-6 text-xs px-2 ${
+                        product.is_sold_out 
+                          ? 'hover:bg-green-500/10 hover:text-green-600 hover:border-green-600' 
+                          : 'hover:bg-red-500/10 hover:text-red-600 hover:border-red-600'
+                      }`}
                     >
                       {product.is_sold_out ? 'Mark Available' : 'Mark Sold Out'}
                     </Button>

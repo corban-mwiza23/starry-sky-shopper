@@ -18,6 +18,7 @@ const ExternalCheckout = () => {
     image: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [quantity] = useState(1); // Fixed quantity for external checkout
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -78,33 +79,41 @@ const ExternalCheckout = () => {
         return false;
       }
 
-      const orderData = {
-        product_id: productDetails.id,
-        quantity: 1,
-        total_price: productDetails.price,
-        customer_name: customerName,
-        user_id: user.id,
-        status: 'pending'
-      };
+      // Process single product order through edge function for proper inventory management
+      const { data, error } = await supabase.functions.invoke('process-order', {
+        body: {
+          items: [{
+            product_id: productDetails.id,
+            quantity: quantity,
+            price: productDetails.price
+          }],
+          customer_name: customerName,
+          user_id: user.id
+        }
+      });
 
-      const { error } = await supabase
-        .from('orders')
-        .insert(orderData);
-
-      if (error) throw error;
+      if (error) {
+        console.error('Order processing error:', error);
+        toast({
+          title: "Order Failed",
+          description: error.message || "Failed to process your order. Please try again.",
+          variant: "destructive",
+        });
+        return false;
+      }
 
       toast({
-        title: "Success",
-        description: "Order placed successfully",
+        title: "Order placed successfully!",
+        description: "Your order has been processed and inventory has been updated.",
       });
 
       setTimeout(() => navigate("/"), 2000);
       return true;
-    } catch (error) {
-      console.error('Error saving order:', error);
+    } catch (error: any) {
+      console.error('Unexpected error during order submission:', error);
       toast({
-        title: "Error",
-        description: "There was a problem saving your order",
+        title: "Order Failed", 
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
       return false;

@@ -77,34 +77,42 @@ const Index = () => {
         return false;
       }
 
-      for (const item of cartItems) {
-        const orderData: Omit<Order, 'id' | 'created_at'> = {
-          product_id: item.id,
-          quantity: item.quantity,
-          total_price: item.price * item.quantity,
+      // Prepare order items for the inventory management function
+      const orderItems = cartItems.map(item => ({
+        product_id: item.id,
+        quantity: item.quantity,
+        price: item.price
+      }));
+
+      // Process order through edge function for proper inventory management
+      const { data, error } = await supabase.functions.invoke('process-order', {
+        body: {
+          items: orderItems,
           customer_name: customerName,
-          user_id: user.id,
-          status: 'pending'
-        };
+          user_id: user.id
+        }
+      });
 
-        const { error } = await supabase
-          .from('orders')
-          .insert(orderData);
-
-        if (error) throw error;
+      if (error) {
+        console.error('Order processing error:', error);
+        toast({
+          title: "Order Failed",
+          description: error.message || "Failed to process your order. Please try again.",
+          variant: "destructive",
+        });
+        return false;
       }
 
       toast({
         title: "Order placed successfully!",
-        description: "Your order has been saved to our database.",
+        description: "Your order has been processed and inventory has been updated.",
       });
-
       return true;
-    } catch (error) {
-      console.error('Error saving order:', error);
+    } catch (error: any) {
+      console.error('Unexpected error during order submission:', error);
       toast({
-        title: "Error placing order",
-        description: "There was a problem saving your order.",
+        title: "Order Failed",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
       return false;
