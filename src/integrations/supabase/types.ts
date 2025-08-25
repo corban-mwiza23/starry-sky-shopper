@@ -169,6 +169,7 @@ export type Database = {
           id: number
           name: string
           order_id: number | null
+          phone_number: string | null
           user_id: string | null
           zip_code: string
         }
@@ -180,6 +181,7 @@ export type Database = {
           id?: number
           name: string
           order_id?: number | null
+          phone_number?: string | null
           user_id?: string | null
           zip_code: string
         }
@@ -191,6 +193,7 @@ export type Database = {
           id?: number
           name?: string
           order_id?: number | null
+          phone_number?: string | null
           user_id?: string | null
           zip_code?: string
         }
