@@ -51,7 +51,7 @@ function App() {
         />
         <Route 
           path="/" 
-          element={isAuthenticated ? <Index /> : <Navigate to="/login" />} 
+          element={<Index />} 
         />
         <Route 
           path="/admin-auth" 
