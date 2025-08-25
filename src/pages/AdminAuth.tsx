@@ -66,23 +66,55 @@ const AdminAuth = () => {
 
       if (error) throw error;
 
-      // The edge function has verified the OTP and created/updated the user
-      // Now we need to sign in the user on the client side
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: email // Using email as password for admin accounts
-      });
-
-      if (signInError) {
-        throw new Error("Authentication failed after OTP verification");
-      }
+      // OTP verified successfully, now sign in or create the user
+      console.log("OTP verified, attempting authentication");
       
-      toast({
-        title: "Access Granted",
-        description: "Welcome to the admin panel!",
-      });
-      navigate("/admin");
+      try {
+        // Try to sign in with email as password
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: email
+        });
+
+        if (signInError && signInError.message?.includes("Invalid login credentials")) {
+          // User doesn't exist, create them
+          console.log("Creating new admin user");
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email: email,
+            password: email,
+            options: {
+              emailRedirectTo: `${window.location.origin}/admin`
+            }
+          });
+
+          if (signUpError) throw signUpError;
+
+          // After signup, sign in immediately
+          const { error: signInAfterSignUpError } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: email
+          });
+
+          if (signInAfterSignUpError) throw signInAfterSignUpError;
+        } else if (signInError) {
+          throw signInError;
+        }
+
+        toast({
+          title: "Access Granted",
+          description: "Welcome to the admin panel!",
+        });
+        navigate("/admin");
+      } catch (authError: any) {
+        console.error("Authentication error:", authError);
+        toast({
+          title: "Authentication Failed",
+          description: "Failed to authenticate after OTP verification",
+          variant: "destructive",
+        });
+      }
     } catch (error: any) {
+      console.error("OTP verification error:", error);
       toast({
         title: "Invalid OTP",
         description: error.message || "Invalid or expired OTP code",

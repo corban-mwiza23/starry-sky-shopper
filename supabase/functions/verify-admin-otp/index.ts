@@ -48,10 +48,21 @@ const handler = async (req: Request): Promise<Response> => {
       .eq('otp_code', otp)
       .eq('used', false)
       .gt('expires_at', new Date().toISOString())
-      .single();
+      .maybeSingle();
 
-    if (fetchError || !otpRecord) {
-      console.log("OTP verification failed:", fetchError);
+    if (fetchError) {
+      console.error("Database error during OTP lookup:", fetchError);
+      return new Response(
+        JSON.stringify({ error: "Database error occurred" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    if (!otpRecord) {
+      console.log("No valid OTP found for:", { email, otp: otp.substring(0, 2) + "****" });
       return new Response(
         JSON.stringify({ error: "Invalid or expired OTP code" }),
         {
@@ -61,6 +72,8 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    console.log("Valid OTP found, marking as used");
+
     // Mark OTP as used
     const { error: updateError } = await supabase
       .from('admin_otps')
@@ -69,53 +82,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (updateError) {
       console.error("Failed to mark OTP as used:", updateError);
-      throw new Error("Failed to process OTP");
-    }
-
-    // Sign in the user or create them if they don't exist
-    let authUser;
-    
-    // Try to get existing user first
-    const { data: existingUser } = await supabase.auth.admin.getUserByEmail(email);
-    
-    if (existingUser.user) {
-      authUser = existingUser.user;
-      
-      // Update user password to ensure consistent access
-      await supabase.auth.admin.updateUserById(existingUser.user.id, {
-        password: email
-      });
-    } else {
-      // Create new user
-      const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
-        email: email,
-        password: email, // Using email as password for admin accounts
-        email_confirm: true
-      });
-
-      if (createError) {
-        console.error("Failed to create admin user:", createError);
-        throw new Error("Failed to authenticate admin user");
-      }
-
-      authUser = newUser.user;
-    }
-
-    // Ensure user has admin role
-    const { data: existingRole } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', authUser.id)
-      .eq('role', 'admin')
-      .single();
-
-    if (!existingRole) {
-      await supabase
-        .from('user_roles')
-        .insert({
-          user_id: authUser.id,
-          role: 'admin'
-        });
+      return new Response(
+        JSON.stringify({ error: "Failed to process OTP" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
     }
 
     // Clean up expired OTPs
@@ -125,7 +98,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify({ 
       success: true,
-      message: "OTP verified successfully" 
+      message: "OTP verified successfully",
+      email: email
     }), {
       status: 200,
       headers: {
